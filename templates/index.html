@@ -160,7 +160,7 @@
     </div>
 
     <div class="main-layout">
-        <!-- القسايمة الجانبية (الترحيب والنموذج أو التنبيه) -->
+        <!-- القسيمة الجانبية (الترحيب والنموذج أو التنبيه) -->
         <div class="form-container">
             <div class="card">
                 <div class="user-welcome-bar">
@@ -183,12 +183,12 @@
 
                         <div class="mb-3">
                             <label>رقم الهوية</label>
-                            <input type="text" name="national_id" class="form-control" placeholder="رقم الهوية الوطنية">
+                            <input type="text" name="national_id" class="form-control" placeholder="10 أرقام" pattern="[0-9]{10}" maxlength="10" title="يجب أن يتكون رقم الهوية من 10 أرقام בדיוק">
                         </div>
 
                         <div class="mb-3">
                             <label>رقم الجوال</label>
-                            <input type="text" name="patient_phone" class="form-control" placeholder="05xxxxxxxx">
+                            <input type="tel" name="patient_phone" class="form-control" placeholder="05xxxxxxxx" pattern="[0-9]{10}" maxlength="10" title="يجب أن يتكون رقم الجوال من 10 أرقام">
                         </div>
 
                         <input type="hidden" id="record_date" name="record_date">
