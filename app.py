@@ -16,8 +16,8 @@ USERS = {
     # المدير (Admin)
     "turky": {"password": "123", "name": "تركي عبدالعزيز", "role": "admin", "title": "مدير النظام", "can_edit": True},
     
-    # المشرفين (Supervisors - للعرض فقط / Read-Only)
-    "mohd": {"password": "123", "name": "محمد", "role": "supervisor", "title": "مشرف", "can_edit": False},
+    # المشرفين (تم منح محمد صلاحية التعديل الكامل، وباقي المشرفين عرض فقط)
+    "mohd": {"password": "123", "name": "محمد", "role": "employee", "title": "مشرف / موظف دعم", "can_edit": True},
     "raja": {"password": "123", "name": "رجاء", "role": "supervisor", "title": "مشرفة", "can_edit": False},
     "hosam": {"password": "123", "name": "حسام", "role": "supervisor", "title": "مشرف", "can_edit": False},
 
@@ -86,10 +86,9 @@ def index():
     if "user" not in session:
         return redirect(url_for("login"))
 
-    # حماية: المشرفون الذين لديهم can_edit = False يمنعون من إضافة أو تعديل السجلات
     if request.method == "POST":
         if not session.get("can_edit", True):
-            return jsonify({"success": False, "message": "غير مصرح للمشرف بإضافة أو تعديل البيانات"}), 403
+            return jsonify({"success": False, "message": "غير مصرح لك بإضافة أو تعديل البيانات"}), 403
 
         form_data = request.form
         logged_emp_name = session.get("employee_name", "موظف النظام")
