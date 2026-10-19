@@ -29,21 +29,19 @@
             border-radius: 10px;
             display: flex;
             align-items: center;
-            justify-content: flex-start; /* لضبط العناصر جهة اليمين */
-            gap: 20px;
+            justify-content: space-between; /* يجعل الشعار في أقصى اليمين والعنوان في المنتصف */
             margin-bottom: 15px;
             box-shadow: 0 4px 12px rgba(31,78,120,0.15);
         }
         .header-banner img {
             width: 230px;
             object-fit: contain;
-            background: white;
-            padding: 4px;
-            border-radius: 6px;
         }
         .header-banner h2 {
             font-size: 1.5rem;
             font-weight: 700;
+            flex-grow: 1;
+            text-align: center;
         }
         .main-layout {
             display: grid;
@@ -166,8 +164,8 @@
 <body>
 <div class="container">
     <div class="header-banner">
-        <img src="{{ url_for('static', filename='../assets/logo.png') }}" alt="شعار المستشفى">
         <h2>وحدة الدعم المساندة - نظام المرضى والخدمات</h2>
+        <img src="{{ url_for('static', filename='../assets/logo.png') }}" alt="شعار المستشفى">
     </div>
 
     <div class="main-layout">
@@ -207,7 +205,22 @@
 
                         <div class="mb-3">
                             <label>نوع الخدمة / الطلب</label>
-                            <input type="text" name="service_type" class="form-control" placeholder="نوع الخدمة المقدمة" required>
+                            <select name="service_type" class="form-select" required>
+                                <option value="" selected disabled>اختر الخدمة المطلوبة</option>
+                                <option value="طلب مقابلة طبيب">طلب مقابلة طبيب</option>
+                                <option value="طلب صرف دواء">طلب صرف دواء</option>
+                                <option value="موعد جديد عيادات">موعد جديد عيادات</option>
+                                <option value="اعادة موعد عيادات">اعادة موعد عيادات</option>
+                                <option value="موعد عيادة الصحة النفسية">موعد عيادة الصحة النفسية</option>
+                                <option value="اعادة موعد عيادة الصحة النفسية">اعادة موعد عيادة الصحة النفسية</option>
+                                <option value="عدم ظهور طلب تحليل في النظام">عدم ظهور طلب تحليل في النظام</option>
+                                <option value="عدم ظهور طلب الاشعة في النظام">عدم ظهور طلب الاشعة في النظام</option>
+                                <option value="عدم ظهور الادوية في النظام">عدم ظهور الادوية في النظام</option>
+                                <option value="طلب مرافقة جديد">طلب مرافقة جديد</option>
+                                <option value="اعادة طلب مرافقة">اعادة طلب مرافقة</option>
+                                <option value="شكوي ضد موظف">شكوي ضد موظف</option>
+                                <option value="شكوى من خدمة">شكوى من خدمة</option>
+                            </select>
                         </div>
 
                         <div class="mb-3">
