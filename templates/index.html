@@ -113,6 +113,16 @@
             background-color: #0ea5e9;
             color: #fff;
         }
+        .supervisor-notice {
+            background-color: #f8fafc;
+            border: 1px dashed #cbd5e1;
+            padding: 15px;
+            border-radius: 6px;
+            text-align: center;
+            color: #64748b;
+            font-size: 0.88rem;
+            line-height: 1.6;
+        }
         .table-responsive {
             width: 100%;
             overflow-x: auto;
@@ -150,65 +160,71 @@
     </div>
 
     <div class="main-layout">
-        <!-- نموذج الإدخال -->
+        <!-- القسايمة الجانبية (الترحيب والنموذج أو التنبيه) -->
         <div class="form-container">
             <div class="card">
-                <h4 class="card-title">تسجيل مريض / خدمة جديدة</h4>
-                
                 <div class="user-welcome-bar">
                     <span>مرحباً، {{ logged_employee }} 👤</span>
                     <a href="/logout" class="logout-link">خروج</a>
                 </div>
 
-                <form action="/" method="POST">
-                    <div class="mb-3">
-                        <label>اسم المريض / المستفيد</label>
-                        <input type="text" name="patient_name" class="form-control" placeholder="اسم المريض الثلاثي" required>
+                {% if can_edit %}
+                    <h4 class="card-title">تسجيل مريض / خدمة جديدة</h4>
+                    <form action="/" method="POST">
+                        <div class="mb-3">
+                            <label>اسم المريض / المستفيد</label>
+                            <input type="text" name="patient_name" class="form-control" placeholder="اسم المريض الثلاثي" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label>رقم الملف الطبي</label>
+                            <input type="text" name="file_number" class="form-control" placeholder="مثال: 815575">
+                        </div>
+
+                        <div class="mb-3">
+                            <label>رقم الهوية</label>
+                            <input type="text" name="national_id" class="form-control" placeholder="رقم الهوية الوطنية">
+                        </div>
+
+                        <div class="mb-3">
+                            <label>رقم الجوال</label>
+                            <input type="text" name="patient_phone" class="form-control" placeholder="05xxxxxxxx">
+                        </div>
+
+                        <input type="hidden" id="record_date" name="record_date">
+                        <input type="hidden" id="record_time" name="record_time">
+
+                        <div class="mb-3">
+                            <label>نوع الخدمة / الطلب</label>
+                            <input type="text" name="service_type" class="form-control" placeholder="نوع الخدمة المقدمة" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label>القسم</label>
+                            <select name="department" class="form-select" required>
+                                <option value="" selected disabled>اختر القسم</option>
+                                <option value="مكتب الدخول">مكتب الدخول</option>
+                                <option value="تمريض الباطنة">تمريض الباطنة</option>
+                                <option value="أطباء الجراحة">أطباء الجراحة</option>
+                                <option value="العلاج الطبيعي">العلاج الطبيعي</option>
+                                <option value="المختبر">المختبر</option>
+                                <option value="الصيدلية">الصيدلية</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label>ملاحظات</label>
+                            <input type="text" name="notes" class="form-control" placeholder="ملاحظات إضافية...">
+                        </div>
+
+                        <button type="submit" class="btn" onclick="setDateTime()">حفظ السجل</button>
+                    </form>
+                {% else %}
+                    <h4 class="card-title">لوحة المشرف</h4>
+                    <div class="supervisor-notice">
+                        <p>أهلاً بك. حسابك بصلاحية <strong>مشرف</strong> للاطلاع ومراجعة سجلات المرضى والخدمات فقط، ولا يمتلك صلاحية إضافة أو تعديل السجلات.</p>
                     </div>
-
-                    <div class="mb-3">
-                        <label>رقم الملف الطبي</label>
-                        <input type="text" name="file_number" class="form-control" placeholder="مثال: 815575">
-                    </div>
-
-                    <div class="mb-3">
-                        <label>رقم الهوية</label>
-                        <input type="text" name="national_id" class="form-control" placeholder="رقم الهوية الوطنية">
-                    </div>
-
-                    <div class="mb-3">
-                        <label>رقم الجوال</label>
-                        <input type="text" name="patient_phone" class="form-control" placeholder="05xxxxxxxx">
-                    </div>
-
-                    <input type="hidden" id="record_date" name="record_date">
-                    <input type="hidden" id="record_time" name="record_time">
-
-                    <div class="mb-3">
-                        <label>نوع الخدمة / الطلب</label>
-                        <input type="text" name="service_type" class="form-control" placeholder="نوع الخدمة المقدمة" required>
-                    </div>
-
-                    <div class="mb-3">
-                        <label>القسم</label>
-                        <select name="department" class="form-select" required>
-                            <option value="" selected disabled>اختر القسم</option>
-                            <option value="مكتب الدخول">مكتب الدخول</option>
-                            <option value="تمريض الباطنة">تمريض الباطنة</option>
-                            <option value="أطباء الجراحة">أطباء الجراحة</option>
-                            <option value="العلاج الطبيعي">العلاج الطبيعي</option>
-                            <option value="المختبر">المختبر</option>
-                            <option value="الصيدلية">الصيدلية</option>
-                        </select>
-                    </div>
-
-                    <div class="mb-3">
-                        <label>ملاحظات</label>
-                        <input type="text" name="notes" class="form-control" placeholder="ملاحظات إضافية...">
-                    </div>
-
-                    <button type="submit" class="btn" onclick="setDateTime()">حفظ السجل</button>
-                </form>
+                {% endif %}
             </div>
         </div>
 
