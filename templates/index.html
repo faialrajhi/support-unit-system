@@ -4,6 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>وحدة الدعم المساندة - نظام المرضى والخدمات</title>
 
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
@@ -28,11 +29,11 @@
             margin: 0 auto;
         }
 
-        /* الشريط الأزرق العلوي */
+        /* الشريط الأزرق */
         .header-banner {
             background: linear-gradient(135deg, #1F4E78 0%, #163a5d 100%);
             color: white;
-            padding: 8px 18px;
+            padding: 5px 18px;
             border-radius: 10px;
             display: flex;
             flex-direction: row-reverse;
@@ -40,23 +41,23 @@
             justify-content: space-between;
             gap: 12px;
             margin-bottom: 15px;
-            box-shadow: 0 4px 12px rgba(31,78,120,0.15);
+            box-shadow: 0 4px 12px rgba(31, 78, 120, 0.15);
         }
 
-       
-.header-banner img {
-    width: 300px !important;
-    height: 110px !important;
-    max-width: none !important;
-    max-height: none !important;
-    object-fit: contain;
-    flex-shrink: 0;
-}
+        /* شعار المستشفى - حجم أكبر */
+        .header-banner img {
+            width: 300px !important;
+            height: 110px !important;
+            max-width: none !important;
+            max-height: none !important;
+            object-fit: contain;
+            flex-shrink: 0;
+            display: block;
+        }
 
-
-        /* عنوان الصفحة */
+        /* عنوان الشريط */
         .header-banner h2 {
-            font-size: 1.2rem;
+            font-size: 1.3rem;
             font-weight: 700;
             flex-grow: 1;
             text-align: center;
@@ -74,7 +75,7 @@
             background: white;
             border-radius: 10px;
             padding: 15px 18px;
-            box-shadow: 0 3px 10px rgba(0,0,0,0.04);
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.04);
             margin-bottom: 15px;
             border: 1px solid #eef2f5;
         }
@@ -100,6 +101,7 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
+            gap: 8px;
         }
 
         .logout-link {
@@ -110,6 +112,7 @@
             padding: 2px 6px;
             border-radius: 4px;
             background: #fee2e2;
+            white-space: nowrap;
         }
 
         .mb-3 {
@@ -132,6 +135,13 @@
             border-radius: 6px;
             font-size: 0.85rem;
             outline: none;
+            background-color: white;
+        }
+
+        .form-control:focus,
+        .form-select:focus {
+            border-color: #38bdf8;
+            box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.12);
         }
 
         .btn {
@@ -149,7 +159,7 @@
 
         .btn:hover {
             background-color: #0ea5e9;
-            color: #fff;
+            color: white;
         }
 
         .supervisor-notice {
@@ -160,7 +170,7 @@
             text-align: center;
             color: #64748b;
             font-size: 0.88rem;
-            line-height: 1.6;
+            line-height: 1.8;
         }
 
         .table-responsive {
@@ -189,6 +199,10 @@
             white-space: nowrap;
         }
 
+        td {
+            overflow-wrap: anywhere;
+        }
+
         tr:hover {
             background-color: #f8fafc;
         }
@@ -198,20 +212,21 @@
             padding: 15px;
         }
 
-        /* توافق الصفحة مع الأجهزة المتوسطة */
+        /* الشاشات المتوسطة */
         @media (max-width: 900px) {
             .main-layout {
                 grid-template-columns: 1fr;
             }
 
             .header-banner {
-                padding: 8px 12px;
+                padding: 5px 12px;
                 gap: 8px;
             }
 
             .header-banner img {
-                width: 160px;
-                max-height: 60px;
+                width: 240px !important;
+                height: 90px !important;
+                max-width: 100% !important;
             }
 
             .header-banner h2 {
@@ -219,7 +234,7 @@
             }
         }
 
-        /* توافق الصفحة مع الجوال */
+        /* الجوال */
         @media (max-width: 480px) {
             body {
                 padding: 8px;
@@ -228,13 +243,13 @@
             .header-banner {
                 flex-direction: column;
                 padding: 10px;
-                gap: 8px;
+                gap: 6px;
             }
 
             .header-banner img {
-                width: 200px;
-                max-width: 100%;
-                max-height: 65px;
+                width: 260px !important;
+                height: 95px !important;
+                max-width: 100% !important;
             }
 
             .header-banner h2 {
@@ -244,6 +259,10 @@
             .card {
                 padding: 12px;
             }
+
+            table {
+                font-size: 0.78rem;
+            }
         }
     </style>
 </head>
@@ -251,7 +270,7 @@
 <body>
 <div class="container">
 
-    <!-- رأس الصفحة وشعار المستشفى -->
+    <!-- رأس الصفحة -->
     <div class="header-banner">
         <h2>وحدة الدعم المساندة - نظام المرضى والخدمات</h2>
 
@@ -263,7 +282,7 @@
 
     <div class="main-layout">
 
-        <!-- القسم الجانبي -->
+        <!-- نموذج تسجيل الخدمات -->
         <div class="form-container">
             <div class="card">
 
@@ -276,12 +295,13 @@
 
                 <h4 class="card-title">تسجيل مريض / خدمة جديدة</h4>
 
-                <form action="/" method="POST">
+                <form action="/" method="POST" onsubmit="setDateTime()">
 
                     <div class="mb-3">
-                        <label>اسم المريض / المستفيد</label>
+                        <label for="patient_name">اسم المريض / المستفيد</label>
                         <input
                             type="text"
+                            id="patient_name"
                             name="patient_name"
                             class="form-control"
                             placeholder="اسم المريض الثلاثي"
@@ -290,9 +310,10 @@
                     </div>
 
                     <div class="mb-3">
-                        <label>رقم الملف الطبي</label>
+                        <label for="file_number">رقم الملف الطبي</label>
                         <input
                             type="text"
+                            id="file_number"
                             name="file_number"
                             class="form-control"
                             placeholder="مثال: 815575"
@@ -300,9 +321,10 @@
                     </div>
 
                     <div class="mb-3">
-                        <label>رقم الهوية</label>
+                        <label for="national_id">رقم الهوية</label>
                         <input
                             type="text"
+                            id="national_id"
                             name="national_id"
                             class="form-control"
                             placeholder="10 أرقام"
@@ -313,9 +335,10 @@
                     </div>
 
                     <div class="mb-3">
-                        <label>رقم الجوال</label>
+                        <label for="patient_phone">رقم الجوال</label>
                         <input
                             type="tel"
+                            id="patient_phone"
                             name="patient_phone"
                             class="form-control"
                             placeholder="05xxxxxxxx"
@@ -329,8 +352,13 @@
                     <input type="hidden" id="record_time" name="record_time">
 
                     <div class="mb-3">
-                        <label>نوع الخدمة / الطلب</label>
-                        <select name="service_type" class="form-select" required>
+                        <label for="service_type">نوع الخدمة / الطلب</label>
+                        <select
+                            id="service_type"
+                            name="service_type"
+                            class="form-select"
+                            required
+                        >
                             <option value="" selected disabled>اختر الخدمة المطلوبة</option>
                             <option value="طلب مقابلة طبيب">طلب مقابلة طبيب</option>
                             <option value="طلب صرف دواء">طلب صرف دواء</option>
@@ -349,8 +377,13 @@
                     </div>
 
                     <div class="mb-3">
-                        <label>القسم</label>
-                        <select name="department" class="form-select" required>
+                        <label for="department">القسم</label>
+                        <select
+                            id="department"
+                            name="department"
+                            class="form-select"
+                            required
+                        >
                             <option value="" selected disabled>اختر القسم</option>
                             <option value="مكتب الدخول">مكتب الدخول</option>
                             <option value="تمريض الباطنة">تمريض الباطنة</option>
@@ -362,16 +395,17 @@
                     </div>
 
                     <div class="mb-3">
-                        <label>ملاحظات</label>
+                        <label for="notes">ملاحظات</label>
                         <input
                             type="text"
+                            id="notes"
                             name="notes"
                             class="form-control"
                             placeholder="ملاحظات إضافية..."
                         >
                     </div>
 
-                    <button type="submit" class="btn" onclick="setDateTime()">
+                    <button type="submit" class="btn">
                         حفظ السجل
                     </button>
 
@@ -382,12 +416,10 @@
                 <h4 class="card-title">لوحة المشرف</h4>
 
                 <div class="supervisor-notice">
-                    <p>
-                        أهلاً بك. حسابك بصلاحية
-                        <strong>مشرف</strong>
-                        للاطلاع ومراجعة سجلات المرضى والخدمات فقط،
-                        ولا يمتلك صلاحية إضافة أو تعديل السجلات.
-                    </p>
+                    أهلاً بك. حسابك بصلاحية
+                    <strong>مشرف</strong>
+                    للاطلاع ومراجعة سجلات المرضى والخدمات فقط،
+                    ولا يمتلك صلاحية إضافة أو تعديل السجلات.
                 </div>
 
                 {% endif %}
@@ -395,7 +427,7 @@
             </div>
         </div>
 
-        <!-- جدول السجلات -->
+        <!-- جدول سجلات المرضى -->
         <div class="table-container">
             <div class="card">
 
@@ -438,7 +470,6 @@
                                 <td>{{ record.get('record_date', '-') }}</td>
                                 <td>{{ record.get('record_time', '-') }}</td>
                             </tr>
-
                             {% else %}
                             <tr>
                                 <td colspan="11" class="text-muted">
@@ -460,11 +491,20 @@
     function setDateTime() {
         const now = new Date();
 
-        document.getElementById('record_date').value =
-            now.toISOString().split('T')[0];
+        const date = [
+            now.getFullYear(),
+            String(now.getMonth() + 1).padStart(2, '0'),
+            String(now.getDate()).padStart(2, '0')
+        ].join('-');
 
-        document.getElementById('record_time').value =
-            now.toTimeString().split(' ')[0];
+        const time = [
+            String(now.getHours()).padStart(2, '0'),
+            String(now.getMinutes()).padStart(2, '0'),
+            String(now.getSeconds()).padStart(2, '0')
+        ].join(':');
+
+        document.getElementById('record_date').value = date;
+        document.getElementById('record_time').value = time;
     }
 </script>
 
