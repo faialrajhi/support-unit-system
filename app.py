@@ -10,14 +10,25 @@ app = Flask(__name__)
 app.secret_key = os.environ.get("FLASK_SECRET_KEY", "support_unit_secret_key_2026")
 
 # =========================
-# قائمة الموظفين لوحدة الدعم المساندة
+# قائمة المستخدمين لوحدة الدعم المساندة
 # =========================
 USERS = {
-    "abdullah": {"password": "123", "name": "عبدالله الزهراني", "role": "employee"},
-    "ahmed": {"password": "123", "name": "احمد عيسى", "role": "employee"},
-    "ebtisam": {"password": "123", "name": "ابتسام المغامسي", "role": "employee"},
-    "nozha": {"password": "123", "name": "نزهه السلولي", "role": "employee"},
-    "khaled": {"password": "123", "name": "خالد الزهراني", "role": "employee"}
+    # المدير (Admin)
+    "turky": {"password": "123", "name": "تركي عبدالعزيز", "role": "admin", "title": "مدير النظام", "can_edit": True},
+    
+    # المشرفين (Supervisors - للعرض فقط / Read-Only)
+    "mohd": {"password": "123", "name": "محمد", "role": "supervisor", "title": "مشرف", "can_edit": False},
+    "raja": {"password": "123", "name": "رجاء", "role": "supervisor", "title": "مشرفة", "can_edit": False},
+    "hosam": {"password": "123", "name": "حسام", "role": "supervisor", "title": "مشرف", "can_edit": False},
+
+    # الموظفين (Employees)
+    "ibrahim": {"password": "123", "name": "ابراهيم بخاري", "role": "employee", "title": "موظف دعم", "can_edit": True},
+    "saleh": {"password": "123", "name": "صالح حنيف", "role": "employee", "title": "موظف دعم", "can_edit": True},
+    "ahlam": {"password": "123", "name": "احلام هوساوي", "role": "employee", "title": "موظفة دعم", "can_edit": True},
+    "maatouq": {"password": "123", "name": "معتوق سيف", "role": "employee", "title": "موظف دعم", "can_edit": True},
+    "saleem": {"password": "123", "name": "سليم الشريف", "role": "employee", "title": "موظف دعم", "can_edit": True},
+    "fowzi": {"password": "123", "name": "فوزي بليلة", "role": "employee", "title": "موظف دعم", "can_edit": True},
+    "rami": {"password": "123", "name": "رامي اللقماني", "role": "employee", "title": "موظف دعم", "can_edit": True}
 }
 
 # =========================
@@ -55,6 +66,8 @@ def login():
         if username in USERS and USERS[username]["password"] == password:
             session["user"] = username
             session["employee_name"] = USERS[username]["name"]
+            session["role"] = USERS[username]["role"]
+            session["can_edit"] = USERS[username]["can_edit"]
             return redirect(url_for("index"))
         else:
             return render_template("login.html", error="اسم المستخدم أو كلمة المرور غير صحيحة")
@@ -73,7 +86,11 @@ def index():
     if "user" not in session:
         return redirect(url_for("login"))
 
+    # حماية: المشرفون الذين لديهم can_edit = False يمنعون من إضافة أو تعديل السجلات
     if request.method == "POST":
+        if not session.get("can_edit", True):
+            return jsonify({"success": False, "message": "غير مصرح للمشرف بإضافة أو تعديل البيانات"}), 403
+
         form_data = request.form
         logged_emp_name = session.get("employee_name", "موظف النظام")
 
@@ -101,7 +118,13 @@ def index():
     except Exception as e:
         records = []
 
-    return render_template("index.html", records=records, logged_employee=session.get("employee_name"))
+    return render_template(
+        "index.html", 
+        records=records, 
+        logged_employee=session.get("employee_name"),
+        can_edit=session.get("can_edit", True),
+        user_role=session.get("role")
+    )
 
 
 if __name__ == "__main__":
