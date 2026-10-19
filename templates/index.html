@@ -29,12 +29,13 @@
             border-radius: 10px;
             display: flex;
             align-items: center;
-            justify-content: space-between; /* يجعل الشعار في أقصى اليمين والعنوان في المنتصف */
+            justify-content: space-between;
             margin-bottom: 15px;
             box-shadow: 0 4px 12px rgba(31,78,120,0.15);
         }
         .header-banner img {
             width: 230px;
+            height: auto;
             object-fit: contain;
         }
         .header-banner h2 {
@@ -165,7 +166,7 @@
 <div class="container">
     <div class="header-banner">
         <h2>وحدة الدعم المساندة - نظام المرضى والخدمات</h2>
-        <img src="{{ url_for('static', filename='../assets/logo.png') }}" alt="شعار المستشفى">
+        <img src="{{ url_for('static', filename='logo.png') }}" alt="شعار المستشفى">
     </div>
 
     <div class="main-layout">
