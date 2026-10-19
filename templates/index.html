@@ -33,16 +33,16 @@
             margin-bottom: 15px;
             box-shadow: 0 4px 12px rgba(31,78,120,0.15);
         }
-                .header-banner img {
-            height: 230px;
-            width: auto;
-            position: absolute;
-            right: 20px;
-            border-radius: 6px;
+        .header-banner img {
+            width: 230px;
+            height: auto;
+            object-fit: contain;
         }
         .header-banner h2 {
-            font-size: 1.6rem;
+            font-size: 1.5rem;
             font-weight: 700;
+            flex-grow: 1;
+            text-align: center;
         }
         .main-layout {
             display: grid;
@@ -166,7 +166,8 @@
 <div class="container">
     <div class="header-banner">
         <h2>وحدة الدعم المساندة - نظام المرضى والخدمات</h2>
-        <img src="{{ url_for('static', filename='../assets/logo .PNG') }}" alt="شعار المستشفى">
+        <!-- تم تعديل مسار الصورة لتسحب مباشرة من مجلد static الجديد -->
+        <img src="{{ url_for('static', filename='logo .PNG') }}" alt="شعار المستشفى">
     </div>
 
     <div class="main-layout">
