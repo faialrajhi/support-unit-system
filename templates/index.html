@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>وحدة الدعم المساندة - نظام المرضى والخدمات</title>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Tajawal', sans-serif !important;
+        }
+        body {
+            background-color: #f4f7f9;
+            color: #2c3e50;
+            padding: 15px;
+        }
+        .container {
+            width: 100%;
+            max-width: 1500px;
+            margin: 0 auto;
+        }
+        .header-banner {
+            background: linear-gradient(135deg, #1F4E78 0%, #163a5d 100%);
+            color: white;
+            padding: 18px 25px;
+            border-radius: 10px;
+            text-align: center;
+            margin-bottom: 15px;
+            box-shadow: 0 4px 12px rgba(31,78,120,0.15);
+        }
+        .header-banner h2 {
+            font-size: 1.6rem;
+            font-weight: 700;
+        }
+        .main-layout {
+            display: grid;
+            grid-template-columns: 320px minmax(0, 1fr);
+            gap: 15px;
+            align-items: start;
+        }
+        .card {
+            background: white;
+            border-radius: 10px;
+            padding: 15px 18px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.04);
+            margin-bottom: 15px;
+            border: 1px solid #eef2f5;
+        }
+        .card-title {
+            color: #1F4E78;
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-bottom: 12px;
+            padding-bottom: 6px;
+            border-bottom: 2px solid #f0f4f8;
+            text-align: center;
+        }
+        .user-welcome-bar {
+            background: #e0f2fe;
+            color: #0369a1;
+            padding: 8px 12px;
+            border-radius: 6px;
+            margin-bottom: 12px;
+            font-weight: 700;
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .logout-link {
+            color: #991b1b;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 0.8rem;
+            padding: 2px 6px;
+            border-radius: 4px;
+            background: #fee2e2;
+        }
+        .mb-3 {
+            margin-bottom: 10px;
+        }
+        label {
+            display: block;
+            margin-bottom: 3px;
+            font-weight: 600;
+            font-size: 0.82rem;
+            color: #34495e;
+        }
+        .form-control, .form-select {
+            width: 100%;
+            padding: 7px 9px;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            outline: none;
+        }
+        .btn {
+            width: 100%;
+            padding: 8px;
+            border: none;
+            border-radius: 6px;
+            font-size: 0.88rem;
+            font-weight: 700;
+            cursor: pointer;
+            margin-top: 5px;
+            background-color: #38bdf8;
+            color: #0f172a;
+        }
+        .btn:hover {
+            background-color: #0ea5e9;
+            color: #fff;
+        }
+        .table-responsive {
+            width: 100%;
+            overflow-x: auto;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: center;
+            font-size: 0.82rem;
+        }
+        th, td {
+            padding: 8px 5px;
+            border-bottom: 1px solid #edf2f7;
+            vertical-align: middle;
+        }
+        th {
+            background-color: #1F4E78;
+            color: white;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+        tr:hover {
+            background-color: #f8fafc;
+        }
+        .text-muted {
+            color: #888;
+            padding: 15px;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header-banner">
+        <h2>وحدة الدعم المساندة - نظام المرضى والخدمات</h2>
+    </div>
+
+    <div class="main-layout">
+        <!-- نموذج الإدخال -->
+        <div class="form-container">
+            <div class="card">
+                <h4 class="card-title">تسجيل مريض / خدمة جديدة</h4>
+                
+                <div class="user-welcome-bar">
+                    <span>مرحباً، {{ logged_employee }} 👤</span>
+                    <a href="/logout" class="logout-link">خروج</a>
+                </div>
+
+                <form action="/" method="POST">
+                    <div class="mb-3">
+                        <label>اسم المريض / المستفيد</label>
+                        <input type="text" name="patient_name" class="form-control" placeholder="اسم المريض الثلاثي" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label>رقم الملف الطبي</label>
+                        <input type="text" name="file_number" class="form-control" placeholder="مثال: 815575">
+                    </div>
+
+                    <div class="mb-3">
+                        <label>رقم الهوية</label>
+                        <input type="text" name="national_id" class="form-control" placeholder="رقم الهوية الوطنية">
+                    </div>
+
+                    <div class="mb-3">
+                        <label>رقم الجوال</label>
+                        <input type="text" name="patient_phone" class="form-control" placeholder="05xxxxxxxx">
+                    </div>
+
+                    <input type="hidden" id="record_date" name="record_date">
+                    <input type="hidden" id="record_time" name="record_time">
+
+                    <div class="mb-3">
+                        <label>نوع الخدمة / الطلب</label>
+                        <input type="text" name="service_type" class="form-control" placeholder="نوع الخدمة المقدمة" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label>القسم</label>
+                        <select name="department" class="form-select" required>
+                            <option value="" selected disabled>اختر القسم</option>
+                            <option value="مكتب الدخول">مكتب الدخول</option>
+                            <option value="تمريض الباطنة">تمريض الباطنة</option>
+                            <option value="أطباء الجراحة">أطباء الجراحة</option>
+                            <option value="العلاج الطبيعي">العلاج الطبيعي</option>
+                            <option value="المختبر">المختبر</option>
+                            <option value="الصيدلية">الصيدلية</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label>ملاحظات</label>
+                        <input type="text" name="notes" class="form-control" placeholder="ملاحظات إضافية...">
+                    </div>
+
+                    <button type="submit" class="btn" onclick="setDateTime()">حفظ السجل</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- جدول السجلات -->
+        <div class="table-container">
+            <div class="card">
+                <h4 class="card-title">سجلات المرضى والخدمات</h4>
+                <div class="table-responsive">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>اسم المريض</th>
+                                <th>رقم الملف</th>
+                                <th>رقم الهوية</th>
+                                <th>الجوال</th>
+                                <th>نوع الخدمة</th>
+                                <th>القسم</th>
+                                <th>الملاحظات</th>
+                                <th>الموظف المسؤول</th>
+                                <th>التاريخ</th>
+                                <th>الوقت</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for record in records %}
+                            <tr>
+                                <td><strong>{{ records|length - loop.index0 }}</strong></td>
+                                <td style="font-weight:700; color:#1F4E78;">{{ record.get('patient_name', '-') }}</td>
+                                <td>{{ record.get('file_number', '-') }}</td>
+                                <td>{{ record.get('national_id', '-') }}</td>
+                                <td>{{ record.get('patient_phone', '-') }}</td>
+                                <td>{{ record.get('service_type', '-') }}</td>
+                                <td>{{ record.get('department', '-') }}</td>
+                                <td>{{ record.get('notes', '-') }}</td>
+                                <td>{{ record.get('employee_name', '-') }}</td>
+                                <td>{{ record.get('record_date', '-') }}</td>
+                                <td>{{ record.get('record_time', '-') }}</td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td colspan="11" class="text-muted">لا توجد سجلات مضافة حالياً.</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function setDateTime() {
+        const now = new Date();
+        document.getElementById('record_date').value = now.toISOString().split('T')[0];
+        document.getElementById('record_time').value = now.toTimeString().split(' ')[0];
+    }
+</script>
+</body>
+</html>
