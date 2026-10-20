@@ -49,7 +49,7 @@
         }
         .main-layout {
             display: grid;
-            grid-template-columns: {% if user_role == 'admin' %}1fr{% else %}320px minmax(0, 1fr){% endif %};
+            grid-template-columns: {% if user_role == 'admin' %}1fr{% else %}340px minmax(0, 1fr){% endif %};
             gap: 15px;
             align-items: start;
         }
@@ -108,19 +108,33 @@
             outline: none;
             background-color: #fff;
         }
-        .btn {
-            width: 100%;
+        .action-buttons {
+            display: flex;
+            gap: 8px;
+            margin-top: 10px;
+        }
+        .btn-action {
+            flex: 1;
             padding: 8px;
             border: none;
             border-radius: 6px;
             font-size: 0.88rem;
             font-weight: 700;
             cursor: pointer;
-            background-color: #1F4E78;
             color: #fff;
+            text-align: center;
+        }
+        .btn-save {
+            background-color: #1F4E78;
+        }
+        .btn-whatsapp {
+            background-color: #25D366;
+        }
+        .btn-sms {
+            background-color: #0284c7;
         }
 
-        /* شريط التصفية والبحث المطابق للصورة */
+        /* شريط التصفية والبحث */
         .filter-bar {
             background-color: #f1f5f9;
             padding: 12px 15px;
@@ -163,18 +177,9 @@
             align-items: center;
             justify-content: center;
         }
-        .btn-search {
-            background-color: #1F4E78;
-            color: white;
-        }
-        .btn-reset {
-            background-color: #475569;
-            color: white;
-        }
-        .btn-excel {
-            background-color: #2e7d32;
-            color: white;
-        }
+        .btn-search { background-color: #1F4E78; color: white; }
+        .btn-reset { background-color: #475569; color: white; }
+        .btn-excel { background-color: #2e7d32; color: white; }
 
         .table-responsive {
             width: 100%;
@@ -197,13 +202,8 @@
             font-weight: 700;
             white-space: nowrap;
         }
-        tr:hover {
-            background-color: #f8fafc;
-        }
-        .text-muted {
-            color: #888;
-            padding: 15px;
-        }
+        tr:hover { background-color: #f8fafc; }
+        .text-muted { color: #888; padding: 15px; }
     </style>
 </head>
 
@@ -218,7 +218,7 @@
 
     <div class="main-layout">
 
-        <!-- نموذج تسجيل المرضى والخدمات -->
+        <!-- لوحة إدخال البيانات -->
         <div class="form-container">
             <div class="card">
                 <div class="user-welcome-bar">
@@ -227,34 +227,34 @@
                 </div>
 
                 {% if can_edit %}
-                <h4 class="card-title">تسجيل مريض / خدمة جديدة</h4>
+                <h4 class="card-title">لوحة إدخال البيانات</h4>
 
                 <form action="/" method="POST" onsubmit="setDateTime()">
                     <div class="mb-3">
-                        <label for="patient_name">اسم المريض / المستفيد</label>
-                        <input type="text" id="patient_name" name="patient_name" class="form-control" placeholder="اسم المريض الثلاثي" required>
-                    </div>
-
-                    <div class="mb-3">
-                        <label for="file_number">رقم الملف الطبي</label>
-                        <input type="text" id="file_number" name="file_number" class="form-control" placeholder="مثال: 815575">
+                        <label for="patient_name">اسم المريض</label>
+                        <input type="text" id="patient_name" name="patient_name" class="form-control" placeholder="اسم المريض" required>
                     </div>
 
                     <div class="mb-3">
                         <label for="national_id">رقم الهوية</label>
-                        <input type="text" id="national_id" name="national_id" class="form-control" placeholder="10 أرقام" pattern="[0-9]{10}" maxlength="10">
+                        <input type="text" id="national_id" name="national_id" class="form-control" placeholder="10xxxxxxx" pattern="[0-9]{10}" maxlength="10">
                     </div>
 
                     <div class="mb-3">
                         <label for="patient_phone">رقم الجوال</label>
-                        <input type="tel" id="patient_phone" name="patient_phone" class="form-control" placeholder="05xxxxxxxx" pattern="[0-9]{10}" maxlength="10">
+                        <input type="tel" id="patient_phone" name="patient_phone" class="form-control" placeholder="05xxxxxxx" pattern="[0-9]{10}" maxlength="10">
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="file_number">رقم الملف</label>
+                        <input type="text" id="file_number" name="file_number" class="form-control" placeholder="30xxxxxx">
                     </div>
 
                     <input type="hidden" id="record_date" name="record_date">
                     <input type="hidden" id="record_time" name="record_time">
 
                     <div class="mb-3">
-                        <label for="service_type">نوع الخدمة / الطلب</label>
+                        <label for="service_type">الخدمة المطلوبة</label>
                         <select id="service_type" name="service_type" class="form-select" required>
                             <option value="" selected disabled>اختر الخدمة المطلوبة</option>
                             <option value="طلب مقابلة طبيب">طلب مقابلة طبيب</option>
@@ -287,12 +287,23 @@
                         </select>
                     </div>
 
+                    <!-- تم إزالة قائمة اسم الموظف حيث يتم أخذه تلقائياً من الجلسة -->
+
                     <div class="mb-3">
-                        <label for="notes">ملاحظات</label>
-                        <input type="text" id="notes" name="notes" class="form-control" placeholder="ملاحظات إضافية...">
+                        <label for="excuse_type">نوع العذر</label>
+                        <select id="excuse_type" name="excuse_type" class="form-select">
+                            <option value="" selected disabled>اختر نوع العذر</option>
+                            <option value="عذر مراجعة">عذر مراجعة</option>
+                            <option value="عذر مرافق">عذر مرافق</option>
+                            <option value="تقرير طبي">تقرير طبي</option>
+                        </select>
                     </div>
 
-                    <button type="submit" class="btn">حفظ السجل</button>
+                    <div class="action-buttons">
+                        <button type="submit" class="btn-action btn-save">حفظ السجل</button>
+                        <button type="button" class="btn-action btn-whatsapp">واتساب</button>
+                        <button type="button" class="btn-action btn-sms">SMS</button>
+                    </div>
                 </form>
 
                 {% else %}
@@ -309,7 +320,7 @@
             <div class="card">
                 <h4 class="card-title">آخر السجلات المسجلة (الشفت الحالي)</h4>
 
-                <!-- شريط الفلترة والبحث أفقياً كما في الصورة -->
+                <!-- شريط الفلترة والبحث -->
                 <form method="GET" action="/" class="filter-bar">
                     <a href="/export_excel" class="btn-filter-action btn-excel">تحميل إلى Excel</a>
                     <a href="/" class="btn-filter-action btn-reset">مسح البحث</a>
@@ -385,7 +396,8 @@
 
         const time = [
             String(now.getHours()).padStart(2, '0'),
-            String(now.getMinutes()).padStart(2, '0')
+            String(now.getMinutes()).padStart(2, '0'),
+            String(now.getSeconds()).padStart(2, '0')
         ].join(':');
 
         document.getElementById('record_date').value = date;
