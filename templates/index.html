@@ -23,8 +23,9 @@
             max-width: 1500px;
             margin: 0 auto;
         }
+        /* شريط العنوان الأعلى باللون الجديد */
         .header-banner {
-            background: #1F4E78;
+            background: #164D6E;
             color: white;
             padding: 18px 25px;
             border-radius: 8px;
@@ -37,7 +38,7 @@
             min-height: 70px;
         }
         .header-banner img {
-            height: 250px;
+            height: 50px;
             width: auto;
             position: absolute;
             right: 20px;
@@ -124,7 +125,7 @@
             color: #fff;
             text-align: center;
         }
-        .btn-save { background-color: #1F4E78; }
+        .btn-save { background-color: #164D6E; }
         .btn-whatsapp { background-color: #25D366; }
         .btn-sms { background-color: #0284c7; }
 
@@ -177,7 +178,7 @@
             justify-content: center;
             white-space: nowrap;
         }
-        .btn-search { background-color: #1F4E78; color: white; }
+        .btn-search { background-color: #164D6E; color: white; }
         .btn-reset { background-color: #475569; color: white; }
         .btn-excel { background-color: #2e7d32; color: white; }
 
@@ -197,7 +198,7 @@
             vertical-align: middle;
         }
         th {
-            background-color: #1F4E78;
+            background-color: #164D6E;
             color: white;
             font-weight: 700;
             white-space: nowrap;
@@ -318,7 +319,7 @@
                 {% else %}
                 <h4 class="card-title">لوحة المشرف</h4>
                 <div class="supervisor-notice">
-                    أهلاً بك. حسابك بصلاحية <strong>مشرف</strong> للاطلاع ومراجعة السجلات فقط.
+                    أهلاً بك. حسابك بصلاحية <strong>مشرف</strong> للاطلاع ومراجع السجلات فقط.
                 </div>
                 {% endif %}
             </div>
@@ -369,7 +370,7 @@
                             {% for record in records %}
                             <tr>
                                 <td><strong>{{ loop.index }}</strong></td>
-                                <td style="font-weight:700; color:#1F4E78;">{{ record.get('patient_name', '-') }}</td>
+                                <td style="font-weight:700; color:#164D6E;">{{ record.get('patient_name', '-') }}</td>
                                 <td>{{ record.get('national_id', '-') }}</td>
                                 <td>{{ record.get('file_number', '-') }}</td>
                                 <td>{{ record.get('service_type', '-') }}</td>
