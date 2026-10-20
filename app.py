@@ -81,7 +81,6 @@ def index():
             "file_number": form_data.get("file_number", "-"),
             "service_type": form_data.get("service_type"),
             "department": form_data.get("department"),
-            "action_taken": form_data.get("action_taken", "-"),
             "employee_name": logged_emp_name,
             "record_date": form_data.get("record_date"),
             "record_time": form_data.get("record_time")
@@ -143,7 +142,6 @@ def export_excel():
             "file_number": "رقم الملف",
             "service_type": "الخدمة المطلوبة",
             "department": "القسم",
-            "action_taken": "الاجراء المتخذ",
             "employee_name": "الموظف المسؤول",
             "record_date": "التاريخ",
             "record_time": "الوقت"
