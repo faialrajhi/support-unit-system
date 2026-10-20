@@ -94,14 +94,13 @@ def index():
         # أخذ اسم الموظف تلقائياً من جلسة الدخول
         logged_emp_name = session.get("employee_name", "موظف النظام")
 
-        record = {
+       record = {
             "patient_name": form_data.get("patient_name"),
             "national_id": form_data.get("national_id", "-"),
             "file_number": form_data.get("file_number", "-"),
             "patient_phone": form_data.get("patient_phone", "-"),
             "service_type": form_data.get("service_type"),
             "department": form_data.get("department"),
-            "excuse_type": form_data.get("excuse_type", "-"),
             "notes": form_data.get("notes", "-"),
             "employee_name": logged_emp_name,
             "record_date": form_data.get("record_date"),
