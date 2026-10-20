@@ -16,7 +16,7 @@ USERS = {
     # المدير (Admin)
     "turky": {"password": "123", "name": "تركي عبدالعزيز", "role": "admin", "title": "مدير النظام", "can_edit": True},
     
-    # المشرفين (تم منح محمد صلاحية التعديل الكامل، وباقي المشرفين عرض فقط)
+    # المشرفين
     "mohd": {"password": "123", "name": "محمد", "role": "employee", "title": "مشرف / موظف دعم", "can_edit": True},
     "raja": {"password": "123", "name": "رجاء", "role": "supervisor", "title": "مشرفة", "can_edit": False},
     "hosam": {"password": "123", "name": "حسام", "role": "supervisor", "title": "مشرف", "can_edit": False},
@@ -44,17 +44,6 @@ supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
 GREEN_API_INSTANCE_ID = os.environ.get("GREEN_API_INSTANCE_ID", "710722772629")
 GREEN_API_TOKEN = os.environ.get("GREEN_API_TOKEN2", os.environ.get("GREEN_API_TOKEN", "e2ff31ea0b24f838a230552e4acabd61fd93c37be6d408ebd"))
 WHATSAPP_GROUP_ID = os.environ.get("WHATSAPP_GROUP_ID", "120363044377285466@g.us")
-
-
-def get_next_record_number():
-    """يحسب رقم السجل التالي بدقة بناءً على السجلات الفعلية + 1"""
-    try:
-        response = supabase.table("support_unit_records").select("id", count="exact").execute()
-        total_records = len(response.data) if response.data else 0
-        return total_records + 1
-    except Exception as e:
-        print("Error calculating record number:", e)
-        return 1
 
 
 @app.route("/login", methods=["GET", "POST"])
@@ -111,10 +100,25 @@ def index():
         except Exception as e:
             return jsonify({"success": False, "message": str(e)}), 500
 
+    # منطق الفلترة والبحث من الاستعلام
+    search_id = request.args.get("search_id", "").strip()
+    from_date = request.args.get("from_date", "").strip()
+    to_date = request.args.get("to_date", "").strip()
+
     try:
-        response = supabase.table("support_unit_records").select("*").order("id", desc=True).execute()
+        query = supabase.table("support_unit_records").select("*")
+
+        if search_id:
+            query = query.ilike("national_id", f"%{search_id}%")
+        if from_date:
+            query = query.gte("record_date", from_date)
+        if to_date:
+            query = query.lte("record_date", to_date)
+
+        response = query.order("id", desc=True).execute()
         records = response.data or []
     except Exception as e:
+        print("Error fetching records:", e)
         records = []
 
     return render_template(
@@ -124,6 +128,52 @@ def index():
         can_edit=session.get("can_edit", True),
         user_role=session.get("role")
     )
+
+
+@app.route("/export_excel")
+def export_excel():
+    """تصدير السجلات الحالية إلى ملف Excel"""
+    if "user" not in session:
+        return redirect(url_for("login"))
+
+    try:
+        response = supabase.table("support_unit_records").select("*").order("id", desc=True).execute()
+        records = response.data or []
+
+        if not records:
+            return "لا توجد سجلات للتصدير", 400
+
+        df = pd.DataFrame(records)
+        
+        # إعادة تسمية الأعمدة لتتناسب مع اللغة العربية
+        rename_map = {
+            "id": "#",
+            "patient_name": "اسم المريض",
+            "national_id": "رقم الهوية",
+            "file_number": "رقم الملف",
+            "patient_phone": "رقم الجوال",
+            "service_type": "الخدمة المطلوبة",
+            "department": "القسم",
+            "notes": "الملاحظات",
+            "employee_name": "الموظف المسؤول",
+            "record_date": "التاريخ",
+            "record_time": "الوقت"
+        }
+        df = df.rename(columns=rename_map)
+
+        output = io.BytesIO()
+        with pd.ExcelWriter(output, engine="openpyxl") as writer:
+            df.to_excel(writer, index=False, sheet_name="السجلات")
+        output.seek(0)
+
+        return send_file(
+            output,
+            mimetype="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            as_attachment=True,
+            download_name=f"records_{datetime.now().strftime('%Y%m%d_%H%M%S')}.xlsx"
+        )
+    except Exception as e:
+        return jsonify({"success": False, "message": str(e)}), 500
 
 
 if __name__ == "__main__":
