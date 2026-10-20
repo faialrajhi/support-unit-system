@@ -128,7 +128,6 @@
         .btn-whatsapp { background-color: #25D366; }
         .btn-sms { background-color: #0284c7; }
 
-        /* شريط التصفية والبحث في سطر واحد مضغوط ومطابق للصورة */
         .filter-bar {
             background-color: #f1f5f9;
             padding: 10px 14px;
@@ -138,7 +137,7 @@
             align-items: center;
             justify-content: space-between;
             gap: 8px;
-            flex-wrap: nowrap; /* إجبار العناصر على عدم النزول لسطر جديد */
+            flex-wrap: nowrap;
             overflow-x: auto;
         }
         .filter-group {
@@ -289,16 +288,6 @@
                     </div>
 
                     <div class="mb-3">
-                        <label for="excuse_type">نوع العذر</label>
-                        <select id="excuse_type" name="excuse_type" class="form-select">
-                            <option value="" selected disabled>اختر نوع العذر</option>
-                            <option value="عذر مراجعة">عذر مراجعة</option>
-                            <option value="عذر مرافق">عذر مرافق</option>
-                            <option value="تقرير طبي">تقرير طبي</option>
-                        </select>
-                    </div>
-
-                    <div class="mb-3">
                         <label for="notes">ملاحظات</label>
                         <input type="text" id="notes" name="notes" class="form-control" placeholder="ملاحظات إضافية...">
                     </div>
@@ -319,12 +308,11 @@
             </div>
         </div>
 
-        <!-- جدول السجلات مع شريط التصفية المتناسق -->
+        <!-- جدول السجلات مع التصفية والبحث -->
         <div class="table-container">
             <div class="card">
                 <h4 class="card-title">آخر السجلات المسجلة (الشفت الحالي)</h4>
 
-                <!-- شريط التصفية والبحث في سطر واحد أفقي مرتب من اليمين لليسار -->
                 <form method="GET" action="/" class="filter-bar">
                     <div class="filter-group">
                         <label>رقم الهوية (بحث شامل):</label>
