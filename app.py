@@ -16,7 +16,7 @@ USERS = {
     # المدير (Admin)
     "turky": {"password": "123", "name": "تركي عبدالعزيز", "role": "admin", "title": "مدير النظام", "can_edit": True},
     
-    # المشرفين
+    # المشرفين (تم منح محمد صلاحية التعديل الكامل، وباقي المشرفين عرض فقط)
     "mohd": {"password": "123", "name": "محمد", "role": "employee", "title": "مشرف / موظف دعم", "can_edit": True},
     "raja": {"password": "123", "name": "رجاء", "role": "supervisor", "title": "مشرفة", "can_edit": False},
     "hosam": {"password": "123", "name": "حسام", "role": "supervisor", "title": "مشرف", "can_edit": False},
@@ -44,6 +44,17 @@ supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
 GREEN_API_INSTANCE_ID = os.environ.get("GREEN_API_INSTANCE_ID", "710722772629")
 GREEN_API_TOKEN = os.environ.get("GREEN_API_TOKEN2", os.environ.get("GREEN_API_TOKEN", "e2ff31ea0b24f838a230552e4acabd61fd93c37be6d408ebd"))
 WHATSAPP_GROUP_ID = os.environ.get("WHATSAPP_GROUP_ID", "120363044377285466@g.us")
+
+
+def get_next_record_number():
+    """يحسب رقم السجل التالي بدقة بناءً على السجلات الفعلية + 1"""
+    try:
+        response = supabase.table("support_unit_records").select("id", count="exact").execute()
+        total_records = len(response.data) if response.data else 0
+        return total_records + 1
+    except Exception as e:
+        print("Error calculating record number:", e)
+        return 1
 
 
 @app.route("/login", methods=["GET", "POST"])
@@ -80,6 +91,7 @@ def index():
             return jsonify({"success": False, "message": "غير مصرح لك بإضافة أو تعديل البيانات"}), 403
 
         form_data = request.form
+        # أخذ اسم الموظف تلقائياً من جلسة الدخول
         logged_emp_name = session.get("employee_name", "موظف النظام")
 
         record = {
@@ -89,6 +101,7 @@ def index():
             "patient_phone": form_data.get("patient_phone", "-"),
             "service_type": form_data.get("service_type"),
             "department": form_data.get("department"),
+            "excuse_type": form_data.get("excuse_type", "-"),
             "notes": form_data.get("notes", "-"),
             "employee_name": logged_emp_name,
             "record_date": form_data.get("record_date"),
@@ -100,7 +113,7 @@ def index():
         except Exception as e:
             return jsonify({"success": False, "message": str(e)}), 500
 
-    # منطق الفلترة والبحث من الاستعلام
+    # استعلامات الفلترة والبحث
     search_id = request.args.get("search_id", "").strip()
     from_date = request.args.get("from_date", "").strip()
     to_date = request.args.get("to_date", "").strip()
@@ -145,7 +158,6 @@ def export_excel():
 
         df = pd.DataFrame(records)
         
-        # إعادة تسمية الأعمدة لتتناسب مع اللغة العربية
         rename_map = {
             "id": "#",
             "patient_name": "اسم المريض",
@@ -154,6 +166,7 @@ def export_excel():
             "patient_phone": "رقم الجوال",
             "service_type": "الخدمة المطلوبة",
             "department": "القسم",
+            "excuse_type": "نوع العذر",
             "notes": "الملاحظات",
             "employee_name": "الموظف المسؤول",
             "record_date": "التاريخ",
