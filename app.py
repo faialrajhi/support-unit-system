@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 import io
 import os
 from flask import Flask, jsonify, redirect, render_template, request, send_file, url_for, session
@@ -91,6 +91,7 @@ def index():
         except Exception as e:
             return jsonify({"success": False, "message": str(e)}), 500
 
+    # استلام مدخلات البحث والتصفية
     search_id = request.args.get("search_id", "").strip()
     from_date = request.args.get("from_date", "").strip()
     to_date = request.args.get("to_date", "").strip()
@@ -98,12 +99,18 @@ def index():
     try:
         query = supabase.table("support_unit_records").select("*")
 
-        if search_id:
-            query = query.ilike("national_id", f"%{search_id}%")
-        if from_date:
-            query = query.gte("record_date", from_date)
-        if to_date:
-            query = query.lte("record_date", to_date)
+        # إذا قام المستخدم بطلب البحث بالهوية أو بالتواريخ
+        if search_id or from_date or to_date:
+            if search_id:
+                query = query.ilike("national_id", f"%{search_id}%")
+            if from_date:
+                query = query.gte("record_date", from_date)
+            if to_date:
+                query = query.lte("record_date", to_date)
+        else:
+            # العرض الافتراضي: عرض سجلات الشفت الحالي فقط (آخر 12 ساعة)
+            twelve_hours_ago = (datetime.now() - timedelta(hours=12)).strftime('%Y-%m-%d')
+            query = query.gte("record_date", twelve_hours_ago)
 
         response = query.order("id", desc=True).execute()
         records = response.data or []
