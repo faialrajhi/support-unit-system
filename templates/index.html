@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>إدارة تجربة المريض - وحدة الدعم المساندة</title>
-    <!-- استدعاء خط IBM Plex Sans Arabic الناعم والواضح -->
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         * {
@@ -39,7 +38,7 @@
             min-height: 60px;
         }
         .header-banner img {
-            height: 200px;
+            height: 42px;
             width: auto;
             position: absolute;
             right: 20px;
@@ -48,7 +47,6 @@
         .header-banner h2 {
             font-size: 1.25rem;
             font-weight: 600;
-            letter-spacing: -0.2px;
         }
         .main-layout {
             display: grid;
@@ -103,7 +101,7 @@
             font-size: 0.8rem;
             color: #475569;
         }
-        .form-control, .form-select, textarea {
+        .form-control, .form-select {
             width: 100%;
             padding: 7px 10px;
             border: 1px solid #cbd5e1;
@@ -112,13 +110,6 @@
             outline: none;
             background-color: #fff;
             color: #1e293b;
-        }
-        .form-control:focus, .form-select:focus, textarea:focus {
-            border-color: #164D6E;
-        }
-        textarea.form-control {
-            resize: vertical;
-            min-height: 65px;
         }
         .btn-save {
             width: 100%;
@@ -133,9 +124,7 @@
             margin-top: 8px;
             transition: background 0.2s;
         }
-        .btn-save:hover {
-            opacity: 0.92;
-        }
+        .btn-save:hover { opacity: 0.92; }
 
         .filter-bar {
             background-color: #f8fafc;
@@ -159,9 +148,7 @@
         .filter-group label {
             font-size: 0.76rem;
             font-weight: 600;
-            margin-bottom: 0;
             color: #475569;
-            white-space: nowrap;
         }
         .filter-input {
             padding: 5px 8px;
@@ -171,9 +158,7 @@
             outline: none;
             background: #fff;
         }
-        .filter-input-id {
-            width: 120px;
-        }
+        .filter-input-id { width: 120px; }
         .btn-filter-action {
             padding: 5px 12px;
             border-radius: 5px;
@@ -216,18 +201,30 @@
         tr:hover { background-color: #f1f5f9; }
         .text-muted { color: #94a3b8; padding: 15px; }
 
-        .patient-link {
-            color: #164D6E;
+        /* أزرار ونوت الإجراء المتخذ */
+        .btn-note {
+            background: #f0f9ff;
+            color: #0369a1;
+            border: 1px solid #bae6fd;
+            padding: 4px 10px;
+            border-radius: 5px;
+            font-size: 0.75rem;
             font-weight: 600;
             cursor: pointer;
-            text-decoration: underline;
-            text-underline-offset: 2px;
+            transition: all 0.2s;
         }
-        .patient-link:hover {
-            color: #0f3750;
+        .btn-note:hover {
+            background: #164D6E;
+            color: white;
+            border-color: #164D6E;
+        }
+        .btn-note-has-text {
+            background: #dcfce7;
+            color: #15803d;
+            border-color: #86efac;
         }
 
-        /* نافذة الملاحظات / الإجراء المتخذ المنبثقة (Modal) */
+        /* نافذة النوت المنبثقة (Modal) */
         .modal-overlay {
             position: fixed;
             top: 0;
@@ -278,33 +275,44 @@
             padding: 16px;
             font-size: 0.85rem;
             color: #334155;
-            line-height: 1.6;
         }
         .modal-patient-name {
             font-weight: 600;
             color: #164D6E;
-            margin-bottom: 8px;
+            margin-bottom: 10px;
             font-size: 0.88rem;
         }
-        .modal-action-text {
-            background: #f8fafc;
-            border: 1px solid #e2e8f0;
-            padding: 10px;
+        .modal-textarea {
+            width: 100%;
+            height: 90px;
+            padding: 8px;
+            border: 1px solid #cbd5e1;
             border-radius: 6px;
-            white-space: pre-wrap;
-            word-break: break-word;
-            min-height: 55px;
             font-size: 0.82rem;
+            outline: none;
+            resize: vertical;
         }
         .modal-footer {
-            padding: 8px 16px 12px;
-            text-align: left;
+            padding: 10px 16px 12px;
+            display: flex;
+            gap: 8px;
+            justify-content: flex-end;
         }
-        .btn-modal-close {
+        .btn-modal-save {
             background: #164D6E;
             color: white;
             border: none;
-            padding: 5px 14px;
+            padding: 6px 16px;
+            border-radius: 5px;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 0.78rem;
+        }
+        .btn-modal-cancel {
+            background: #64748b;
+            color: white;
+            border: none;
+            padding: 6px 12px;
             border-radius: 5px;
             font-weight: 600;
             cursor: pointer;
@@ -369,7 +377,7 @@
                             <option value="عدم ظهور الادوية في النظام">عدم ظهور الادوية في النظام</option>
                             <option value="طلب مرافقة جديد">طلب مرافقة جديد</option>
                             <option value="اعادة طلب مرافقة">اعادة طلب مرافقة</option>
-                            <option value="شكوي ضد موظف">شكوى ضد موظف</option>
+                            <option value="شكوي ضد موظف">شكوي ضد موظف</option>
                             <option value="شكوى من خدمة">شكوى من خدمة</option>
                         </select>
                     </div>
@@ -404,11 +412,6 @@
                         </select>
                     </div>
 
-                    <div class="mb-3">
-                        <label for="action_taken">الإجراء المتخذ / ملاحظات</label>
-                        <textarea id="action_taken" name="action_taken" class="form-control" placeholder="اكتب الإجراء المتخذ هنا..."></textarea>
-                    </div>
-
                     <button type="submit" class="btn-save">حفظ السجل</button>
                 </form>
 
@@ -424,12 +427,12 @@
         <!-- جدول السجلات مع التصفية والبحث -->
         <div class="table-container">
             <div class="card">
-                <h4 class="card-title">آخر السجلات المسجلة </h4>
+                <h4 class="card-title">آخر السجلات المسجلة (الشفت الحالي)</h4>
 
                 <form method="GET" action="/" class="filter-bar">
                     <div class="filter-group">
-                        <label>رقم الهوية:</label>
-                        <input type="text" name="search_id" value="{{ request.args.get('search_id', '') }}" placeholder="ابحث بالهوية..." class="filter-input filter-input-id">
+                        <label>رقم الهوية (بحث شامل):</label>
+                        <input type="text" name="search_id" value="{{ request.args.get('search_id', '') }}" placeholder="ابحث بالحوية..." class="filter-input filter-input-id">
                     </div>
 
                     <div class="filter-group">
@@ -457,6 +460,7 @@
                                 <th>رقم الملف</th>
                                 <th>الخدمة المطلوبة</th>
                                 <th>القسم</th>
+                                <th>الإجراء المتخذ</th>
                                 <th>الموظف / القائم بالخدمة</th>
                                 <th>التاريخ</th>
                                 <th>الوقت</th>
@@ -466,22 +470,32 @@
                             {% for record in records %}
                             <tr>
                                 <td><strong>{{ loop.index }}</strong></td>
-                                <td>
-                                    <span class="patient-link" onclick="showActionTaken('{{ record.get('patient_name', '-') }}', '{{ record.get('action_taken', record.get('notes', 'لا يوجد إجراء موثق.')) }}')">
-                                        {{ record.get('patient_name', '-') }}
-                                    </span>
+                                <td style="font-weight:600; color:#164D6E;">
+                                    {{ record.get('patient_name', '-') }}
                                 </td>
                                 <td>{{ record.get('national_id', '-') }}</td>
                                 <td>{{ record.get('file_number', '-') }}</td>
                                 <td>{{ record.get('service_type', '-') }}</td>
                                 <td>{{ record.get('department', '-') }}</td>
+                                <td>
+                                    {% set action_text = record.get('action_taken', '') %}
+                                    <button type="button" 
+                                            class="btn-note {% if action_text and action_text.strip() != '' %}btn-note-has-text{% endif %}" 
+                                            onclick="openActionNote('{{ record.get('id') }}', '{{ record.get('patient_name', '') }}', '{{ action_text|e }}')">
+                                        {% if action_text and action_text.strip() != '' %}
+                                            تم تدوين الإجراء 📝
+                                        {% else %}
+                                            + إضافة إشعار/إجراء
+                                        {% endif %}
+                                    </button>
+                                </td>
                                 <td>{{ record.get('employee_name', '-') }}</td>
                                 <td>{{ record.get('record_date', '-') }}</td>
                                 <td>{{ record.get('record_time', '-') }}</td>
                             </tr>
                             {% else %}
                             <tr>
-                                <td colspan="9" class="text-muted">لا توجد سجلات مضافة حالياً.</td>
+                                <td colspan="10" class="text-muted">لا توجد سجلات مضافة حالياً.</td>
                             </tr>
                             {% endfor %}
                         </tbody>
@@ -494,19 +508,21 @@
     </div>
 </div>
 
-<!-- النافذة المنبثقة لإظهار الإجراء المتخذ -->
-<div id="actionModal" class="modal-overlay" onclick="closeModalOnOverlay(event)">
+<!-- النافذة المنبثقة لكتابة/تعديل نوت الإجراء المتخذ -->
+<div id="noteModal" class="modal-overlay" onclick="closeModalOnOverlay(event)">
     <div class="modal-card">
         <div class="modal-header">
-            <h3>تفاصيل الإجراء المتخذ</h3>
-            <button class="modal-close" onclick="closeModal()">&times;</button>
+            <h3>تدوين الإجراء المتخذ</h3>
+            <button class="modal-close" onclick="closeNoteModal()">&times;</button>
         </div>
         <div class="modal-body">
-            <div class="modal-patient-name" id="modalPatientName"></div>
-            <div class="modal-action-text" id="modalActionText"></div>
+            <div class="modal-patient-name" id="modalPatientTitle"></div>
+            <textarea id="modalActionInput" class="modal-textarea" placeholder="اكتب الإجراء المتخذ هنا..."></textarea>
+            <input type="hidden" id="modalRecordId">
         </div>
         <div class="modal-footer">
-            <button class="btn-modal-close" onclick="closeModal()">إغلاق</button>
+            <button type="button" class="btn-modal-save" onclick="saveActionNote()">حفظ الإجراء</button>
+            <button type="button" class="btn-modal-cancel" onclick="closeNoteModal()">إلغاء</button>
         </div>
     </div>
 </div>
@@ -530,20 +546,50 @@
         document.getElementById('record_time').value = time;
     }
 
-    function showActionTaken(patientName, actionText) {
-        document.getElementById('modalPatientName').innerText = "المريض: " + patientName;
-        document.getElementById('modalActionText').innerText = actionText && actionText.trim() !== "" ? actionText : "لا يوجد إجراء موثق لهذا السجل.";
-        document.getElementById('actionModal').style.display = 'flex';
+    function openActionNote(recordId, patientName, currentAction) {
+        document.getElementById('modalRecordId').value = recordId;
+        document.getElementById('modalPatientTitle').innerText = "المريض: " + patientName;
+        document.getElementById('modalActionInput').value = currentAction ? currentAction : "";
+        document.getElementById('noteModal').style.display = 'flex';
     }
 
-    function closeModal() {
-        document.getElementById('actionModal').style.display = 'none';
+    function closeNoteModal() {
+        document.getElementById('noteModal').style.display = 'none';
     }
 
     function closeModalOnOverlay(event) {
-        if (event.target.id === 'actionModal') {
-            closeModal();
+        if (event.target.id === 'noteModal') {
+            closeNoteModal();
         }
+    }
+
+    function saveActionNote() {
+        const recordId = document.getElementById('modalRecordId').value;
+        const actionText = document.getElementById('modalActionInput').value;
+
+        fetch('/update_action', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                record_id: recordId,
+                action_taken: actionText
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                closeNoteModal();
+                window.location.reload();
+            } else {
+                alert('حدث خطأ أثناء الحفظ: ' + data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('تعذر الاتصال بالسيرفر');
+        });
     }
 </script>
 </body>
