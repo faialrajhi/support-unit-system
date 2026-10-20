@@ -37,7 +37,7 @@
             min-height: 70px;
         }
         .header-banner img {
-            height: 250px;
+            height: 50px;
             width: auto;
             position: absolute;
             right: 20px;
@@ -124,51 +124,51 @@
             color: #fff;
             text-align: center;
         }
-        .btn-save {
-            background-color: #1F4E78;
-        }
-        .btn-whatsapp {
-            background-color: #25D366;
-        }
-        .btn-sms {
-            background-color: #0284c7;
-        }
+        .btn-save { background-color: #1F4E78; }
+        .btn-whatsapp { background-color: #25D366; }
+        .btn-sms { background-color: #0284c7; }
 
-        /* شريط التصفية والبحث */
+        /* شريط التصفية والبحث في سطر واحد مضغوط ومطابق للصورة */
         .filter-bar {
             background-color: #f1f5f9;
-            padding: 12px 15px;
+            padding: 10px 14px;
             border-radius: 8px;
             margin-bottom: 15px;
             display: flex;
             align-items: center;
-            justify-content: flex-end;
-            gap: 10px;
-            flex-wrap: wrap;
+            justify-content: space-between;
+            gap: 8px;
+            flex-wrap: nowrap; /* إجبار العناصر على عدم النزول لسطر جديد */
+            overflow-x: auto;
         }
         .filter-group {
             display: flex;
             align-items: center;
-            gap: 5px;
+            gap: 4px;
+            white-space: nowrap;
         }
         .filter-group label {
-            font-size: 0.8rem;
+            font-size: 0.78rem;
             font-weight: 700;
             margin-bottom: 0;
+            color: #334155;
             white-space: nowrap;
         }
         .filter-input {
-            padding: 6px 10px;
+            padding: 5px 8px;
             border: 1px solid #cbd5e1;
             border-radius: 5px;
-            font-size: 0.82rem;
+            font-size: 0.8rem;
             outline: none;
             background: #fff;
         }
+        .filter-input-id {
+            width: 130px;
+        }
         .btn-filter-action {
-            padding: 6px 14px;
+            padding: 6px 12px;
             border-radius: 5px;
-            font-size: 0.82rem;
+            font-size: 0.8rem;
             font-weight: 700;
             border: none;
             cursor: pointer;
@@ -176,6 +176,7 @@
             display: inline-flex;
             align-items: center;
             justify-content: center;
+            white-space: nowrap;
         }
         .btn-search { background-color: #1F4E78; color: white; }
         .btn-reset { background-color: #475569; color: white; }
@@ -287,8 +288,6 @@
                         </select>
                     </div>
 
-                    <!-- تم إزالة قائمة اسم الموظف حيث يتم أخذه تلقائياً من الجلسة -->
-
                     <div class="mb-3">
                         <label for="excuse_type">نوع العذر</label>
                         <select id="excuse_type" name="excuse_type" class="form-select">
@@ -297,6 +296,11 @@
                             <option value="عذر مرافق">عذر مرافق</option>
                             <option value="تقرير طبي">تقرير طبي</option>
                         </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="notes">ملاحظات</label>
+                        <input type="text" id="notes" name="notes" class="form-control" placeholder="ملاحظات إضافية...">
                     </div>
 
                     <div class="action-buttons">
@@ -315,20 +319,16 @@
             </div>
         </div>
 
-        <!-- جدول السجلات مع التصفية والبحث -->
+        <!-- جدول السجلات مع شريط التصفية المتناسق -->
         <div class="table-container">
             <div class="card">
                 <h4 class="card-title">آخر السجلات المسجلة (الشفت الحالي)</h4>
 
-                <!-- شريط الفلترة والبحث -->
+                <!-- شريط التصفية والبحث في سطر واحد أفقي مرتب من اليمين لليسار -->
                 <form method="GET" action="/" class="filter-bar">
-                    <a href="/export_excel" class="btn-filter-action btn-excel">تحميل إلى Excel</a>
-                    <a href="/" class="btn-filter-action btn-reset">مسح البحث</a>
-                    <button type="submit" class="btn-filter-action btn-search">بحث</button>
-
                     <div class="filter-group">
-                        <label>إلى تاريخ:</label>
-                        <input type="date" name="to_date" value="{{ request.args.get('to_date', '') }}" class="filter-input">
+                        <label>رقم الهوية (بحث شامل):</label>
+                        <input type="text" name="search_id" value="{{ request.args.get('search_id', '') }}" placeholder="ابحث بالحوية..." class="filter-input filter-input-id">
                     </div>
 
                     <div class="filter-group">
@@ -337,9 +337,13 @@
                     </div>
 
                     <div class="filter-group">
-                        <label>رقم الهوية (بحث شامل):</label>
-                        <input type="text" name="search_id" value="{{ request.args.get('search_id', '') }}" placeholder="ابحث بالحوية..." class="filter-input">
+                        <label>إلى تاريخ:</label>
+                        <input type="date" name="to_date" value="{{ request.args.get('to_date', '') }}" class="filter-input">
                     </div>
+
+                    <button type="submit" class="btn-filter-action btn-search">بحث</button>
+                    <a href="/" class="btn-filter-action btn-reset">مسح البحث</a>
+                    <a href="/export_excel" class="btn-filter-action btn-excel">تحميل إلى Excel</a>
                 </form>
 
                 <div class="table-responsive">
