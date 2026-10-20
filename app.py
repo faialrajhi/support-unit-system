@@ -81,6 +81,7 @@ def index():
             "file_number": form_data.get("file_number", "-"),
             "service_type": form_data.get("service_type"),
             "department": form_data.get("department"),
+            "action_taken": form_data.get("action_taken", "-"),
             "employee_name": logged_emp_name,
             "record_date": form_data.get("record_date"),
             "record_time": form_data.get("record_time")
@@ -91,7 +92,6 @@ def index():
         except Exception as e:
             return jsonify({"success": False, "message": str(e)}), 500
 
-    # استلام مدخلات البحث والتصفية
     search_id = request.args.get("search_id", "").strip()
     from_date = request.args.get("from_date", "").strip()
     to_date = request.args.get("to_date", "").strip()
@@ -99,7 +99,6 @@ def index():
     try:
         query = supabase.table("support_unit_records").select("*")
 
-        # إذا قام المستخدم بطلب البحث بالهوية أو بالتواريخ
         if search_id or from_date or to_date:
             if search_id:
                 query = query.ilike("national_id", f"%{search_id}%")
@@ -108,7 +107,6 @@ def index():
             if to_date:
                 query = query.lte("record_date", to_date)
         else:
-            # العرض الافتراضي: عرض سجلات الشفت الحالي فقط (آخر 12 ساعة)
             twelve_hours_ago = (datetime.now() - timedelta(hours=12)).strftime('%Y-%m-%d')
             query = query.gte("record_date", twelve_hours_ago)
 
@@ -149,6 +147,7 @@ def export_excel():
             "file_number": "رقم الملف",
             "service_type": "الخدمة المطلوبة",
             "department": "القسم",
+            "action_taken": "الاجراء المتخذ",
             "employee_name": "الموظف المسؤول",
             "record_date": "التاريخ",
             "record_time": "الوقت"
