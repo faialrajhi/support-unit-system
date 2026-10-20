@@ -3,25 +3,16 @@ import io
 import os
 from flask import Flask, jsonify, redirect, render_template, request, send_file, url_for, session
 import pandas as pd
-import requests
 from supabase import Client, create_client
 
 app = Flask(__name__)
 app.secret_key = os.environ.get("FLASK_SECRET_KEY", "support_unit_secret_key_2026")
 
-# =========================
-# قائمة المستخدمين لوحدة الدعم المساندة
-# =========================
 USERS = {
-    # المدير (Admin)
     "turky": {"password": "123", "name": "تركي عبدالعزيز", "role": "admin", "title": "مدير النظام", "can_edit": True},
-    
-    # المشرفين
     "mohd": {"password": "123", "name": "محمد", "role": "employee", "title": "مشرف / موظف دعم", "can_edit": True},
     "raja": {"password": "123", "name": "رجاء", "role": "supervisor", "title": "مشرفة", "can_edit": False},
     "hosam": {"password": "123", "name": "حسام", "role": "supervisor", "title": "مشرف", "can_edit": False},
-
-    # الموظفين (Employees)
     "ibrahim": {"password": "123", "name": "ابراهيم بخاري", "role": "employee", "title": "موظف دعم", "can_edit": True},
     "saleh": {"password": "123", "name": "صالح حنيف", "role": "employee", "title": "موظف دعم", "can_edit": True},
     "ahlam": {"password": "123", "name": "احلام هوساوي", "role": "employee", "title": "موظفة دعم", "can_edit": True},
@@ -31,13 +22,9 @@ USERS = {
     "rami": {"password": "123", "name": "رامي اللقماني", "role": "employee", "title": "موظف دعم", "can_edit": True}
 }
 
-# =========================
-# Supabase Configuration
-# =========================
 SUPABASE_URL = os.environ.get("SUPABASE_URL", "https://urnawuapfkhxvqvepzit.supabase.co")
 SUPABASE_KEY = os.environ.get("SUPABASE_KEY", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVybmF3dWFwZmtoeHZxdmVweml0Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc4ODA5NTQxMCwiZXhwIjoyMTAzNjcxNDEwfQ.hg8Ki6qvoI_Fhammt_87t-HfTZPSdvl6nYn5bUtThzo")
 supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
-
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
@@ -56,12 +43,10 @@ def login():
 
     return render_template("login.html")
 
-
 @app.route("/logout")
 def logout():
     session.clear()
     return redirect(url_for("login"))
-
 
 @app.route("/", methods=["GET", "POST"])
 def index():
@@ -81,7 +66,6 @@ def index():
             "file_number": form_data.get("file_number", "-"),
             "service_type": form_data.get("service_type"),
             "department": form_data.get("department"),
-            "action_taken": form_data.get("action_taken", "-"),
             "employee_name": logged_emp_name,
             "record_date": form_data.get("record_date"),
             "record_time": form_data.get("record_time")
@@ -124,10 +108,24 @@ def index():
         user_role=session.get("role")
     )
 
+@app.route("/update_action", methods=["POST"])
+def update_action():
+    """حفظ وتحديث نوت الإجراء المتخذ مباشرة من جدول السجلات"""
+    if "user" not in session or not session.get("can_edit", True):
+        return jsonify({"success": False, "message": "غير مصرح لك"}), 403
+
+    data = request.get_json()
+    record_id = data.get("record_id")
+    action_taken = data.get("action_taken", "")
+
+    try:
+        supabase.table("support_unit_records").update({"action_taken": action_taken}).eq("id", record_id).execute()
+        return jsonify({"success": True})
+    except Exception as e:
+        return jsonify({"success": False, "message": str(e)}), 500
 
 @app.route("/export_excel")
 def export_excel():
-    """تصدير السجلات الحالية إلى ملف Excel"""
     if "user" not in session:
         return redirect(url_for("login"))
 
@@ -167,7 +165,6 @@ def export_excel():
         )
     except Exception as e:
         return jsonify({"success": False, "message": str(e)}), 500
-
 
 if __name__ == "__main__":
     app.run(debug=True)
