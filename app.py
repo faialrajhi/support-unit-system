@@ -16,7 +16,7 @@ USERS = {
     # المدير (Admin)
     "turky": {"password": "123", "name": "تركي عبدالعزيز", "role": "admin", "title": "مدير النظام", "can_edit": True},
     
-    # المشرفين (تم منح محمد صلاحية التعديل الكامل، وباقي المشرفين عرض فقط)
+    # المشرفين
     "mohd": {"password": "123", "name": "محمد", "role": "employee", "title": "مشرف / موظف دعم", "can_edit": True},
     "raja": {"password": "123", "name": "رجاء", "role": "supervisor", "title": "مشرفة", "can_edit": False},
     "hosam": {"password": "123", "name": "حسام", "role": "supervisor", "title": "مشرف", "can_edit": False},
@@ -91,10 +91,9 @@ def index():
             return jsonify({"success": False, "message": "غير مصرح لك بإضافة أو تعديل البيانات"}), 403
 
         form_data = request.form
-        # أخذ اسم الموظف تلقائياً من جلسة الدخول
         logged_emp_name = session.get("employee_name", "موظف النظام")
 
-       record = {
+        record = {
             "patient_name": form_data.get("patient_name"),
             "national_id": form_data.get("national_id", "-"),
             "file_number": form_data.get("file_number", "-"),
@@ -112,7 +111,6 @@ def index():
         except Exception as e:
             return jsonify({"success": False, "message": str(e)}), 500
 
-    # استعلامات الفلترة والبحث
     search_id = request.args.get("search_id", "").strip()
     from_date = request.args.get("from_date", "").strip()
     to_date = request.args.get("to_date", "").strip()
@@ -165,7 +163,6 @@ def export_excel():
             "patient_phone": "رقم الجوال",
             "service_type": "الخدمة المطلوبة",
             "department": "القسم",
-            "excuse_type": "نوع العذر",
             "notes": "الملاحظات",
             "employee_name": "الموظف المسؤول",
             "record_date": "التاريخ",
