@@ -66,6 +66,7 @@ def index():
             "file_number": form_data.get("file_number", "-"),
             "service_type": form_data.get("service_type"),
             "department": form_data.get("department"),
+            "notes": "-",
             "employee_name": logged_emp_name,
             "record_date": form_data.get("record_date"),
             "record_time": form_data.get("record_time")
@@ -110,7 +111,7 @@ def index():
 
 @app.route("/update_action", methods=["POST"])
 def update_action():
-    """حفظ وتحديث نوت الإجراء المتخذ مباشرة من جدول السجلات"""
+    """تحديث الإجراء المتخذ عند النقر على اسم المريض وتأكيد الحفظ"""
     if "user" not in session or not session.get("can_edit", True):
         return jsonify({"success": False, "message": "غير مصرح لك"}), 403
 
@@ -119,7 +120,7 @@ def update_action():
     action_taken = data.get("action_taken", "")
 
     try:
-        supabase.table("support_unit_records").update({"action_taken": action_taken}).eq("id", record_id).execute()
+        supabase.table("support_unit_records").update({"notes": action_taken}).eq("id", record_id).execute()
         return jsonify({"success": True})
     except Exception as e:
         return jsonify({"success": False, "message": str(e)}), 500
@@ -145,7 +146,7 @@ def export_excel():
             "file_number": "رقم الملف",
             "service_type": "الخدمة المطلوبة",
             "department": "القسم",
-            "action_taken": "الاجراء المتخذ",
+            "notes": "الاجراء المتخذ / الملاحظات",
             "employee_name": "الموظف المسؤول",
             "record_date": "التاريخ",
             "record_time": "الوقت"
