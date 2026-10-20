@@ -38,7 +38,7 @@
             min-height: 70px;
         }
         .header-banner img {
-            height: 230px;
+            height: 50px;
             width: auto;
             position: absolute;
             right: 20px;
@@ -109,25 +109,21 @@
             outline: none;
             background-color: #fff;
         }
-        .action-buttons {
-            display: flex;
-            gap: 8px;
-            margin-top: 10px;
-        }
-        .btn-action {
-            flex: 1;
-            padding: 8px;
+        .btn-save {
+            width: 100%;
+            padding: 10px;
             border: none;
             border-radius: 6px;
-            font-size: 0.88rem;
+            font-size: 0.9rem;
             font-weight: 700;
             cursor: pointer;
             color: #fff;
-            text-align: center;
+            background-color: #164D6E;
+            margin-top: 10px;
         }
-        .btn-save { background-color: #164D6E; }
-        .btn-whatsapp { background-color: #25D366; }
-        .btn-sms { background-color: #0284c7; }
+        .btn-save:hover {
+            opacity: 0.9;
+        }
 
         .filter-bar {
             background-color: #f1f5f9;
@@ -242,11 +238,6 @@
                     </div>
 
                     <div class="mb-3">
-                        <label for="patient_phone">رقم الجوال</label>
-                        <input type="tel" id="patient_phone" name="patient_phone" class="form-control" placeholder="05xxxxxxx" pattern="[0-9]{10}" maxlength="10">
-                    </div>
-
-                    <div class="mb-3">
                         <label for="file_number">رقم الملف</label>
                         <input type="text" id="file_number" name="file_number" class="form-control" placeholder="30xxxxxx">
                     </div>
@@ -309,17 +300,13 @@
                         <input type="text" id="notes" name="notes" class="form-control" placeholder="ملاحظات إضافية...">
                     </div>
 
-                    <div class="action-buttons">
-                        <button type="submit" class="btn-action btn-save">حفظ السجل</button>
-                        <button type="button" class="btn-action btn-whatsapp">واتساب</button>
-                        <button type="button" class="btn-action btn-sms">SMS</button>
-                    </div>
+                    <button type="submit" class="btn-save">حفظ السجل</button>
                 </form>
 
                 {% else %}
                 <h4 class="card-title">لوحة المشرف</h4>
                 <div class="supervisor-notice">
-                    أهلاً بك. حسابك بصلاحية <strong>مشرف</strong> للاطلاع ومراجع السجلات فقط.
+                    أهلاً بك. حسابك بصلاحية <strong>مشرف</strong> للاطلاع ومراجعة السجلات فقط.
                 </div>
                 {% endif %}
             </div>
