@@ -38,24 +38,6 @@ SUPABASE_URL = os.environ.get("SUPABASE_URL", "https://urnawuapfkhxvqvepzit.supa
 SUPABASE_KEY = os.environ.get("SUPABASE_KEY", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVybmF3dWFwZmtoeHZxdmVweml0Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc4ODA5NTQxMCwiZXhwIjoyMTAzNjcxNDEwfQ.hg8Ki6qvoI_Fhammt_87t-HfTZPSdvl6nYn5bUtThzo")
 supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
 
-# =========================
-# Green API Configuration
-# =========================
-GREEN_API_INSTANCE_ID = os.environ.get("GREEN_API_INSTANCE_ID", "710722772629")
-GREEN_API_TOKEN = os.environ.get("GREEN_API_TOKEN2", os.environ.get("GREEN_API_TOKEN", "e2ff31ea0b24f838a230552e4acabd61fd93c37be6d408ebd"))
-WHATSAPP_GROUP_ID = os.environ.get("WHATSAPP_GROUP_ID", "120363044377285466@g.us")
-
-
-def get_next_record_number():
-    """يحسب رقم السجل التالي بدقة بناءً على السجلات الفعلية + 1"""
-    try:
-        response = supabase.table("support_unit_records").select("id", count="exact").execute()
-        total_records = len(response.data) if response.data else 0
-        return total_records + 1
-    except Exception as e:
-        print("Error calculating record number:", e)
-        return 1
-
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
@@ -97,10 +79,9 @@ def index():
             "patient_name": form_data.get("patient_name"),
             "national_id": form_data.get("national_id", "-"),
             "file_number": form_data.get("file_number", "-"),
-            "patient_phone": form_data.get("patient_phone", "-"),
             "service_type": form_data.get("service_type"),
             "department": form_data.get("department"),
-            "notes": form_data.get("notes", "-"),
+            "action_taken": form_data.get("action_taken", "-"),
             "employee_name": logged_emp_name,
             "record_date": form_data.get("record_date"),
             "record_time": form_data.get("record_time")
@@ -160,10 +141,9 @@ def export_excel():
             "patient_name": "اسم المريض",
             "national_id": "رقم الهوية",
             "file_number": "رقم الملف",
-            "patient_phone": "رقم الجوال",
             "service_type": "الخدمة المطلوبة",
             "department": "القسم",
-            "notes": "الملاحظات",
+            "action_taken": "الاجراء المتخذ",
             "employee_name": "الموظف المسؤول",
             "record_date": "التاريخ",
             "record_time": "الوقت"
