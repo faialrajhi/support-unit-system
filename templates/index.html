@@ -38,7 +38,7 @@
             min-height: 60px;
         }
         .header-banner img {
-            height: 42px;
+            height: 200px;
             width: auto;
             position: absolute;
             right: 20px;
@@ -377,7 +377,7 @@
                             <option value="عدم ظهور الادوية في النظام">عدم ظهور الادوية في النظام</option>
                             <option value="طلب مرافقة جديد">طلب مرافقة جديد</option>
                             <option value="اعادة طلب مرافقة">اعادة طلب مرافقة</option>
-                            <option value="شكوي ضد موظف">شكوي ضد موظف</option>
+                            <option value="شكوي ضد موظف">شكوى ضد موظف</option>
                             <option value="شكوى من خدمة">شكوى من خدمة</option>
                         </select>
                     </div>
@@ -427,12 +427,12 @@
         <!-- جدول السجلات مع التصفية والبحث -->
         <div class="table-container">
             <div class="card">
-                <h4 class="card-title">آخر السجلات المسجلة (الشفت الحالي)</h4>
+                <h4 class="card-title">آخر السجلات المسجلة</h4>
 
                 <form method="GET" action="/" class="filter-bar">
                     <div class="filter-group">
-                        <label>رقم الهوية (بحث شامل):</label>
-                        <input type="text" name="search_id" value="{{ request.args.get('search_id', '') }}" placeholder="ابحث بالحوية..." class="filter-input filter-input-id">
+                        <label>رقم الهوية:</label>
+                        <input type="text" name="search_id" value="{{ request.args.get('search_id', '') }}" placeholder="ابحث بالهوية..." class="filter-input filter-input-id">
                     </div>
 
                     <div class="filter-group">
