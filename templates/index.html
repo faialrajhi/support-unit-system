@@ -201,27 +201,16 @@
         tr:hover { background-color: #f1f5f9; }
         .text-muted { color: #94a3b8; padding: 15px; }
 
-        /* أزرار ونوت الإجراء المتخذ */
-        .btn-note {
-            background: #f0f9ff;
-            color: #0369a1;
-            border: 1px solid #bae6fd;
-            padding: 4px 10px;
-            border-radius: 5px;
-            font-size: 0.75rem;
+        /* جعل اسم المريض كـ رابط قابل للنقر */
+        .patient-link {
+            color: #164D6E;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.2s;
+            text-decoration: underline;
+            text-underline-offset: 3px;
         }
-        .btn-note:hover {
-            background: #164D6E;
-            color: white;
-            border-color: #164D6E;
-        }
-        .btn-note-has-text {
-            background: #dcfce7;
-            color: #15803d;
-            border-color: #86efac;
+        .patient-link:hover {
+            color: #0f3750;
         }
 
         /* نافذة النوت المنبثقة (Modal) */
@@ -284,7 +273,7 @@
         }
         .modal-textarea {
             width: 100%;
-            height: 90px;
+            height: 100px;
             padding: 8px;
             border: 1px solid #cbd5e1;
             border-radius: 6px;
@@ -455,12 +444,11 @@
                         <thead>
                             <tr>
                                 <th>#</th>
-                                <th>الاسم</th>
+                                <th>اسم المريض</th>
                                 <th>الهوية</th>
                                 <th>رقم الملف</th>
                                 <th>الخدمة المطلوبة</th>
                                 <th>القسم</th>
-                                <th>الإجراء المتخذ</th>
                                 <th>الموظف / القائم بالخدمة</th>
                                 <th>التاريخ</th>
                                 <th>الوقت</th>
@@ -468,34 +456,29 @@
                         </thead>
                         <tbody>
                             {% for record in records %}
+                            {% set note_text = record.get('notes', '') %}
+                            {% set is_valid_note = note_text and note_text.strip() != '' and note_text.strip() != '-' %}
                             <tr>
                                 <td><strong>{{ loop.index }}</strong></td>
-                                <td style="font-weight:600; color:#164D6E;">
-                                    {{ record.get('patient_name', '-') }}
+                                <td>
+                                    <!-- الضغط على اسم المريض يفتح نافذة كتابة/عرض الإجراء المتخذ -->
+                                    <span class="patient-link" 
+                                          title="انقر لتعديل أو عرض الإجراء المتخذ"
+                                          onclick="openActionNote('{{ record.get('id') }}', '{{ record.get('patient_name', '') }}', '{% if is_valid_note %}{{ note_text|e }}{% endif %}')">
+                                        {{ record.get('patient_name', '-') }} {% if is_valid_note %}📝{% endif %}
+                                    </span>
                                 </td>
                                 <td>{{ record.get('national_id', '-') }}</td>
                                 <td>{{ record.get('file_number', '-') }}</td>
                                 <td>{{ record.get('service_type', '-') }}</td>
                                 <td>{{ record.get('department', '-') }}</td>
-                                <td>
-                                    {% set action_text = record.get('action_taken', '') %}
-                                    <button type="button" 
-                                            class="btn-note {% if action_text and action_text.strip() != '' %}btn-note-has-text{% endif %}" 
-                                            onclick="openActionNote('{{ record.get('id') }}', '{{ record.get('patient_name', '') }}', '{{ action_text|e }}')">
-                                        {% if action_text and action_text.strip() != '' %}
-                                            تم تدوين الإجراء 📝
-                                        {% else %}
-                                            + إضافة إشعار/إجراء
-                                        {% endif %}
-                                    </button>
-                                </td>
                                 <td>{{ record.get('employee_name', '-') }}</td>
                                 <td>{{ record.get('record_date', '-') }}</td>
                                 <td>{{ record.get('record_time', '-') }}</td>
                             </tr>
                             {% else %}
                             <tr>
-                                <td colspan="10" class="text-muted">لا توجد سجلات مضافة حالياً.</td>
+                                <td colspan="9" class="text-muted">لا توجد سجلات مضافة حالياً.</td>
                             </tr>
                             {% endfor %}
                         </tbody>
@@ -508,16 +491,16 @@
     </div>
 </div>
 
-<!-- النافذة المنبثقة لكتابة/تعديل نوت الإجراء المتخذ -->
+<!-- النافذة المنبثقة عند الضغط على اسم المريض (تدوين/تعديل الإجراء المتخذ) -->
 <div id="noteModal" class="modal-overlay" onclick="closeModalOnOverlay(event)">
     <div class="modal-card">
         <div class="modal-header">
-            <h3>تدوين الإجراء المتخذ</h3>
+            <h3>الإجراء المتخذ / ملاحظات</h3>
             <button class="modal-close" onclick="closeNoteModal()">&times;</button>
         </div>
         <div class="modal-body">
             <div class="modal-patient-name" id="modalPatientTitle"></div>
-            <textarea id="modalActionInput" class="modal-textarea" placeholder="اكتب الإجراء المتخذ هنا..."></textarea>
+            <textarea id="modalActionInput" class="modal-textarea" placeholder="اكتب الإجراء المتخذ للمريض هنا..."></textarea>
             <input type="hidden" id="modalRecordId">
         </div>
         <div class="modal-footer">
