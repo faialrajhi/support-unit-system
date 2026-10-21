@@ -15,8 +15,8 @@ app.secret_key = os.environ.get("FLASK_SECRET_KEY", "support_unit_secret_key_202
 GREEN_API_INSTANCE_ID = os.environ.get("GREEN_API_INSTANCE_ID", "710722772629")
 GREEN_API_TOKEN = os.environ.get("GREEN_API_TOKEN", "2e2ff31ea0b24f838a230552e4acabd61fd93c37be6d408ebd")
 
-def send_whatsapp_green_api(phone, patient_name, service_type):
-    """دالة لإرسال رسالة واتساب تلقائية للمريض عبر Green API"""
+def send_whatsapp_green_api(phone, patient_name, service_type, national_id, department, target_employee, logged_emp_name):
+    """دالة لإرسال رسالة واتساب بتنسيق محدد ومباشر للمريض عبر Green API"""
     if not phone or phone.strip() in ["-", ""]:
         return
 
@@ -32,10 +32,13 @@ def send_whatsapp_green_api(phone, patient_name, service_type):
     url = f"https://api.green-api.com/waInstance{GREEN_API_INSTANCE_ID}/sendMessage/{GREEN_API_TOKEN}"
 
     message_text = (
-        f"عزيزي المريض {patient_name}،\n\n"
-        f"تم تسجيل طلبك ({service_type}) بنجاح لدى وحدة الدعم المساندة.\n"
-        f"نعمل على متابعة طلبك وخدمتك في أقرب وقت.\n\n"
-        f"نتمنى لك دوام الصحة والعافية 🌸"
+        f"اسم المستفيد: {patient_name}\n"
+        f"رقم الهوية: {national_id}\n"
+        f"رقم الجوال: {phone}\n"
+        f"الخدمة: {service_type}\n"
+        f"القسم: {department}\n"
+        f"الموظف المعني: {target_employee}\n"
+        f"موظف تجربة المريض: {logged_emp_name}"
     )
 
     payload = {
@@ -70,7 +73,7 @@ USERS = {
     "fowzi": {"password": "123", "name": "فوزي بليلة", "role": "employee", "title": "موظف دعم", "can_edit": True},
     "rami": {"password": "123", "name": "رامي اللقماني", "role": "employee", "title": "موظف دعم", "can_edit": True},
 
-    # حسابات المتطوعين والمتدربين
+    # حسابات المتطوعين ومتدربي تمهير
     "tatwa1": {"password": "123", "name": "تطوع1", "role": "employee", "title": "متطوع", "can_edit": True},
     "tatwa2": {"password": "123", "name": "تطوع2", "role": "employee", "title": "متطوع", "can_edit": True},
     "tamheer1": {"password": "123", "name": "تمهير1", "role": "employee", "title": "متدرب تمهير", "can_edit": True},
@@ -119,17 +122,20 @@ def index():
 
         patient_name = form_data.get("patient_name")
         patient_phone = form_data.get("patient_phone", "-")
+        national_id = form_data.get("national_id", "-")
         service_type = form_data.get("service_type")
+        department = form_data.get("department")
+        target_employee = form_data.get("target_employee", "-")
         send_whatsapp = form_data.get("send_whatsapp_flag", "yes")
 
         record = {
             "patient_name": patient_name,
             "patient_phone": patient_phone,
-            "national_id": form_data.get("national_id", "-"),
+            "national_id": national_id,
             "file_number": form_data.get("file_number", "-"),
             "service_type": service_type,
-            "department": form_data.get("department"),
-            "target_employee": form_data.get("target_employee", "-"), # الموظف المعني بالخدمة
+            "department": department,
+            "target_employee": target_employee,
             "notes": "-",
             "employee_name": logged_emp_name,
             "record_date": form_data.get("record_date"),
@@ -138,9 +144,17 @@ def index():
         try:
             supabase.table("support_unit_records").insert(record).execute()
 
-            # إرسال التنبيه التلقائي للمريض عبر Green API عند اختيار زر الواتساب
+            # إرسال التنبيه التلقائي للمريض عبر Green API فور اختيار زر الواتساب
             if send_whatsapp == "yes":
-                send_whatsapp_green_api(patient_phone, patient_name, service_type)
+                send_whatsapp_green_api(
+                    phone=patient_phone,
+                    patient_name=patient_name,
+                    service_type=service_type,
+                    national_id=national_id,
+                    department=department,
+                    target_employee=target_employee,
+                    logged_emp_name=logged_emp_name
+                )
 
             return redirect(url_for("index"))
         except Exception as e:
@@ -218,7 +232,7 @@ def export_excel():
             "department": "القسم",
             "target_employee": "الموظف المعني",
             "notes": "الاجراء المتخذ / الملاحظات",
-            "employee_name": "الموظف المنسق (كاتب السجل)",
+            "employee_name": "موظف تجربة المريض",
             "record_date": "التاريخ",
             "record_time": "الوقت"
         }
