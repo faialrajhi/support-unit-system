@@ -535,7 +535,7 @@
     </div>
 </div>
 
-<!-- مكتبة Supabase للتحديث اللحظي -->
+<!-- مكتبة Supabase للتحديث اللحظي بدون مسح حقول الإدخال -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
     const SUPABASE_URL = "https://urnawuapfkhxvqvepzit.supabase.co";
@@ -543,20 +543,27 @@
     
     const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
+    // التحقق عما إذا كان المستخدم يكتب حالياً في النموذج لمنع أي تحديث مزعج
+    function isUserTyping() {
+        const activeElement = document.activeElement;
+        if (!activeElement) return false;
+        const tag = activeElement.tagName.toLowerCase();
+        return tag === 'input' || tag === 'textarea' || tag === 'select';
+    }
+
+    // الاستماع اللحظي: يتم تحديث الصفحة فقط إذا كان المستخدم لا يكتب شيئاً الآن
     supabaseClient
         .channel('support_unit_realtime')
         .on(
             'postgres_changes',
             { event: '*', schema: 'public', table: 'support_unit_records' },
             (payload) => {
-                window.location.reload();
+                if (!isUserTyping()) {
+                    window.location.reload();
+                }
             }
         )
         .subscribe();
-
-    setInterval(function() {
-        window.location.reload();
-    }, 15000);
 
     function setDateTime() {
         const now = new Date();
@@ -597,7 +604,6 @@
 
         setDateTime();
         
-        // حساب رقم تذكرة تسلسلي جديد يبدأ من 1 بناءً على عدد السجلات الحالية في الجدول + 1
         const totalRecords = {{ records|length }};
         const nextTicketNo = totalRecords + 1;
         document.getElementById('ticketNumber').innerText = "#" + nextTicketNo;
@@ -607,7 +613,6 @@
         document.getElementById('ticketDept').innerText = pDept;
         document.getElementById('ticketTargetEmp').innerText = pTargetEmp;
         
-        // تنسيق التاريخ والوقت ليطابق صيغة المتصفح بالأعلى
         const now = new Date();
         const formattedDate = (now.getMonth() + 1) + '/' + now.getDate() + '/' + now.getFullYear().toString().slice(-2);
         let hours = now.getHours();
