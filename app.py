@@ -1,6 +1,7 @@
 from datetime import datetime, timedelta
 import io
 import os
+import re
 import requests
 from flask import Flask, jsonify, redirect, render_template, request, send_file, url_for, session
 import pandas as pd
@@ -17,38 +18,44 @@ GREEN_API_TOKEN = os.environ.get("GREEN_API_TOKEN", "2e2ff31ea0b24f838a230552e4a
 
 def send_whatsapp_green_api(phone, patient_name, service_type, national_id, department, target_employee, logged_emp_name):
     """دالة لإرسال رسالة واتساب بتنسيق محدد ومباشر للمريض عبر Green API"""
-    if not phone or phone.strip() in ["-", ""]:
+    if not phone or str(phone).strip() in ["-", ""]:
         return
 
-    # تنظيف وتنسيق رقم الجوال للصيغة الدولية (مثل: 0512345678 -> 966512345678)
-    clean_phone = phone.strip()
+    # استخراج الأرقام فقط وحذف أي مسافات أو رموز
+    clean_phone = re.sub(r'\D', '', str(phone).strip())
+
+    # تحويل الرقم إلى الصيغة الدولية السعودية (966)
     if clean_phone.startswith("05"):
         clean_phone = "966" + clean_phone[1:]
-    elif clean_phone.startswith("5"):
+    elif clean_phone.startswith("5") and len(clean_phone) == 9:
         clean_phone = "966" + clean_phone
-    elif clean_phone.startswith("+"):
-        clean_phone = clean_phone[1:]
+    elif clean_phone.startswith("00966"):
+        clean_phone = clean_phone[5:]
 
     url = f"https://api.green-api.com/waInstance{GREEN_API_INSTANCE_ID}/sendMessage/{GREEN_API_TOKEN}"
 
-    message_text = (
-        f"اسم المستفيد: {patient_name}\n"
-        f"رقم الهوية: {national_id}\n"
-        f"رقم الجوال: {phone}\n"
-        f"الخدمة: {service_type}\n"
-        f"القسم: {department}\n"
-        f"الموظف المعني: {target_employee}\n"
-        f"موظف تجربة المريض: {logged_emp_name}"
-    )
+    # إعداد نص الرسالة بتنسيق المباشر المحدد
+    lines = [
+        f"اسم المستفيد: {patient_name or '-'}",
+        f"رقم الهوية: {national_id or '-'}",
+        f"رقم الجوال: {phone or '-'}",
+        f"الخدمة: {service_type or '-'}",
+        f"القسم: {department or '-'}",
+        f"الموظف المعني: {target_employee or '-'}",
+        f"موظف تجربة المريض: {logged_emp_name or '-'}"
+    ]
+    message_text = "\n".join(lines)
 
     payload = {
         "chatId": f"{clean_phone}@c.us",
         "message": message_text
     }
-    headers = {'Content-Type': 'application/json'}
+    headers = {'Content-Type': 'application/json; charset=utf-8'}
 
     try:
-        requests.post(url, json=payload, headers=headers, timeout=5)
+        response = requests.post(url, json=payload, headers=headers, timeout=10)
+        print("Green API Status Code:", response.status_code)
+        print("Green API Response:", response.text)
     except Exception as e:
         print("خطأ أثناء إرسال رسالة الواتساب عبر Green API:", e)
 
@@ -144,7 +151,7 @@ def index():
         try:
             supabase.table("support_unit_records").insert(record).execute()
 
-            # إرسال التنبيه التلقائي للمريض عبر Green API فور اختيار زر الواتساب
+            # إرسال التنبيه التلقائي للمريض عبر Green API عند الضغط على زر الواتساب
             if send_whatsapp == "yes":
                 send_whatsapp_green_api(
                     phone=patient_phone,
