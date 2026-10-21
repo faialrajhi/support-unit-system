@@ -38,7 +38,7 @@
             min-height: 60px;
         }
         .header-banner img {
-            height: 200px;
+            height: 42px;
             width: auto;
             position: absolute;
             right: 20px;
@@ -50,7 +50,7 @@
         }
         .main-layout {
             display: grid;
-            grid-template-columns: {% if user_role == 'admin' %}1fr{% else %}320px minmax(0, 1fr){% endif %};
+            grid-template-columns: {% if user_role == 'admin' %}1fr{% else %}340px minmax(0, 1fr){% endif %};
             gap: 15px;
             align-items: start;
         }
@@ -111,20 +111,33 @@
             background-color: #fff;
             color: #1e293b;
         }
-        .btn-save {
+
+        /* أزرار الإجراءات في نموذج الإدخال */
+        .btn-group-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-top: 12px;
+        }
+        .btn-action {
             width: 100%;
             padding: 9px;
             border: none;
             border-radius: 6px;
-            font-size: 0.85rem;
+            font-size: 0.82rem;
             font-weight: 600;
             cursor: pointer;
             color: #fff;
-            background-color: #164D6E;
-            margin-top: 8px;
-            transition: background 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            transition: opacity 0.2s;
         }
-        .btn-save:hover { opacity: 0.92; }
+        .btn-action:hover { opacity: 0.92; }
+        .btn-whatsapp { background-color: #25D366; }
+        .btn-print { background-color: #0284c7; }
+        .btn-save-only { background-color: #164D6E; }
 
         .filter-bar {
             background-color: #f8fafc;
@@ -201,7 +214,6 @@
         tr:hover { background-color: #f1f5f9; }
         .text-muted { color: #94a3b8; padding: 15px; }
 
-        /* جعل اسم المريض كـ رابط قابل للنقر */
         .patient-link {
             color: #164D6E;
             font-weight: 600;
@@ -209,11 +221,9 @@
             text-decoration: underline;
             text-underline-offset: 3px;
         }
-        .patient-link:hover {
-            color: #0f3750;
-        }
+        .patient-link:hover { color: #0f3750; }
 
-        /* نافذة النوت المنبثقة (Modal) */
+        /* النافذة المنبثقة والنوت */
         .modal-overlay {
             position: fixed;
             top: 0;
@@ -248,64 +258,28 @@
             align-items: center;
             justify-content: space-between;
         }
-        .modal-header h3 {
-            font-size: 0.9rem;
-            font-weight: 600;
-        }
-        .modal-close {
-            background: transparent;
-            border: none;
-            color: white;
-            font-size: 1.3rem;
-            cursor: pointer;
-            line-height: 1;
-        }
-        .modal-body {
-            padding: 16px;
-            font-size: 0.85rem;
-            color: #334155;
-        }
-        .modal-patient-name {
-            font-weight: 600;
-            color: #164D6E;
-            margin-bottom: 10px;
-            font-size: 0.88rem;
-        }
-        .modal-textarea {
-            width: 100%;
-            height: 100px;
-            padding: 8px;
-            border: 1px solid #cbd5e1;
-            border-radius: 6px;
-            font-size: 0.82rem;
-            outline: none;
-            resize: vertical;
-        }
-        .modal-footer {
-            padding: 10px 16px 12px;
-            display: flex;
-            gap: 8px;
-            justify-content: flex-end;
-        }
-        .btn-modal-save {
-            background: #164D6E;
-            color: white;
-            border: none;
-            padding: 6px 16px;
-            border-radius: 5px;
-            font-weight: 600;
-            cursor: pointer;
-            font-size: 0.78rem;
-        }
-        .btn-modal-cancel {
-            background: #64748b;
-            color: white;
-            border: none;
-            padding: 6px 12px;
-            border-radius: 5px;
-            font-weight: 600;
-            cursor: pointer;
-            font-size: 0.78rem;
+        .modal-header h3 { font-size: 0.9rem; font-weight: 600; }
+        .modal-close { background: transparent; border: none; color: white; font-size: 1.3rem; cursor: pointer; }
+        .modal-body { padding: 16px; font-size: 0.85rem; color: #334155; }
+        .modal-patient-name { font-weight: 600; color: #164D6E; margin-bottom: 10px; font-size: 0.88rem; }
+        .modal-textarea { width: 100%; height: 100px; padding: 8px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 0.82rem; outline: none; resize: vertical; }
+        .modal-footer { padding: 10px 16px 12px; display: flex; gap: 8px; justify-content: flex-end; }
+        .btn-modal-save { background: #164D6E; color: white; border: none; padding: 6px 16px; border-radius: 5px; font-weight: 600; cursor: pointer; font-size: 0.78rem; }
+        .btn-modal-cancel { background: #64748b; color: white; border: none; padding: 6px 12px; border-radius: 5px; font-weight: 600; cursor: pointer; font-size: 0.78rem; }
+
+        /* تنسيق قالب تذكرة الطباعة المخفية */
+        @media print {
+            body * { visibility: hidden; }
+            #printTicketArea, #printTicketArea * { visibility: visible; }
+            #printTicketArea {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 80mm;
+                padding: 10px;
+                text-align: center;
+                font-family: 'IBM Plex Sans Arabic', sans-serif !important;
+            }
         }
     </style>
 </head>
@@ -313,7 +287,6 @@
 <body>
 <div class="container">
 
-    <!-- رأس الصفحة وشعار المستشفى -->
     <div class="header-banner">
         <h2>إدارة تجربة المريض - وحدة الدعم المساندة</h2>
         <img src="{{ url_for('static', filename='logo.png') }}" alt="شعار المستشفى">
@@ -332,10 +305,15 @@
                 {% if can_edit %}
                 <h4 class="card-title">لوحة إدخال البيانات</h4>
 
-                <form action="/" method="POST" onsubmit="setDateTime()">
+                <form id="recordForm" action="/" method="POST" onsubmit="setDateTime()">
                     <div class="mb-3">
                         <label for="patient_name">اسم المريض</label>
                         <input type="text" id="patient_name" name="patient_name" class="form-control" placeholder="اسم المريض" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="patient_phone">رقم الجوال (لإرسال إشعار الواتساب)</label>
+                        <input type="text" id="patient_phone" name="patient_phone" class="form-control" placeholder="05xxxxxxxx" pattern="05[0-9]{8}" maxlength="10">
                     </div>
 
                     <div class="mb-3">
@@ -350,6 +328,7 @@
 
                     <input type="hidden" id="record_date" name="record_date">
                     <input type="hidden" id="record_time" name="record_time">
+                    <input type="hidden" id="send_whatsapp_flag" name="send_whatsapp_flag" value="yes">
 
                     <div class="mb-3">
                         <label for="service_type">الخدمة المطلوبة</label>
@@ -366,7 +345,7 @@
                             <option value="عدم ظهور الادوية في النظام">عدم ظهور الادوية في النظام</option>
                             <option value="طلب مرافقة جديد">طلب مرافقة جديد</option>
                             <option value="اعادة طلب مرافقة">اعادة طلب مرافقة</option>
-                            <option value="شكوي ضد موظف">شكوى ضد موظف</option>
+                            <option value="شكوي ضد موظف">شكوي ضد موظف</option>
                             <option value="شكوى من خدمة">شكوى من خدمة</option>
                         </select>
                     </div>
@@ -401,7 +380,18 @@
                         </select>
                     </div>
 
-                    <button type="submit" class="btn-save">حفظ السجل</button>
+                    <!-- خيارات الحفظ والطباعة والواتساب -->
+                    <div class="btn-group-actions">
+                        <button type="submit" onclick="submitWithWhatsapp()" class="btn-action btn-whatsapp">
+                            💬 حفظ وإرسال واتساب
+                        </button>
+                        <button type="button" onclick="submitAndPrintTicket()" class="btn-action btn-print">
+                            🖨️ حفظ وطباعة تذكرة الانتظار
+                        </button>
+                        <button type="submit" onclick="submitOnlySave()" class="btn-action btn-save-only">
+                            💾 حفظ بالسجل فقط
+                        </button>
+                    </div>
                 </form>
 
                 {% else %}
@@ -413,15 +403,15 @@
             </div>
         </div>
 
-        <!-- جدول السجلات مع التصفية والبحث -->
+        <!-- جدول السجلات -->
         <div class="table-container">
             <div class="card">
-                <h4 class="card-title">آخر السجلات المسجلة</h4>
+                <h4 class="card-title">آخر السجلات المسجلة (الشفت الحالي)</h4>
 
                 <form method="GET" action="/" class="filter-bar">
                     <div class="filter-group">
-                        <label>رقم الهوية:</label>
-                        <input type="text" name="search_id" value="{{ request.args.get('search_id', '') }}" placeholder="ابحث بالهوية..." class="filter-input filter-input-id">
+                        <label>رقم الهوية (بحث شامل):</label>
+                        <input type="text" name="search_id" value="{{ request.args.get('search_id', '') }}" placeholder="ابحث بالحوية..." class="filter-input filter-input-id">
                     </div>
 
                     <div class="filter-group">
@@ -461,7 +451,6 @@
                             <tr>
                                 <td><strong>{{ loop.index }}</strong></td>
                                 <td>
-                                    <!-- الضغط على اسم المريض يفتح نافذة كتابة/عرض الإجراء المتخذ -->
                                     <span class="patient-link" 
                                           title="انقر لتعديل أو عرض الإجراء المتخذ"
                                           onclick="openActionNote('{{ record.get('id') }}', '{{ record.get('patient_name', '') }}', '{% if is_valid_note %}{{ note_text|e }}{% endif %}')">
@@ -491,7 +480,7 @@
     </div>
 </div>
 
-<!-- النافذة المنبثقة عند الضغط على اسم المريض (تدوين/تعديل الإجراء المتخذ) -->
+<!-- النافذة المنبثقة للتعديل -->
 <div id="noteModal" class="modal-overlay" onclick="closeModalOnOverlay(event)">
     <div class="modal-card">
         <div class="modal-header">
@@ -507,6 +496,26 @@
             <button type="button" class="btn-modal-save" onclick="saveActionNote()">حفظ الإجراء</button>
             <button type="button" class="btn-modal-cancel" onclick="closeNoteModal()">إلغاء</button>
         </div>
+    </div>
+</div>
+
+<!-- منطقة طباعة تذكرة الانتظار -->
+<div id="printTicketArea" style="display:none;">
+    <div style="border: 2px dashed #164D6E; padding: 15px; border-radius: 8px; font-family: sans-serif; text-align: center;">
+        <h3 style="margin-bottom: 5px; color: #164D6E;">وحدة الدعم المساندة</h3>
+        <p style="font-size: 11px; margin-bottom: 10px;">إدارة تجربة المريض</p>
+        <hr style="border: 0.5px solid #ccc; margin-bottom: 10px;">
+        <div style="font-size: 12px; color: #555;">تذكرة المراجعة والانتظار</div>
+        <div id="ticketNumber" style="font-size: 28px; font-weight: bold; color: #164D6E; margin: 10px 0;">#00</div>
+        <div style="text-align: right; font-size: 12px; line-height: 1.8;">
+            <strong>اسم المريض:</strong> <span id="ticketPatientName">-</span><br>
+            <strong>الخدمة المطلوبة:</strong> <span id="ticketService">-</span><br>
+            <strong>القسم:</strong> <span id="ticketDept">-</span><br>
+            <strong>التاريخ والوقت:</strong> <span id="ticketDateTime">-</span><br>
+            <strong>الموظف:</strong> <span>{{ logged_employee }}</span>
+        </div>
+        <hr style="border: 0.5px solid #ccc; margin: 10px 0;">
+        <p style="font-size: 10px; color: #777;">نتمنى لك دوام الصحة والعافية</p>
     </div>
 </div>
 
@@ -527,6 +536,42 @@
 
         document.getElementById('record_date').value = date;
         document.getElementById('record_time').value = time;
+    }
+
+    function submitWithWhatsapp() {
+        document.getElementById('send_whatsapp_flag').value = "yes";
+    }
+
+    function submitOnlySave() {
+        document.getElementById('send_whatsapp_flag').value = "no";
+    }
+
+    function submitAndPrintTicket() {
+        const pName = document.getElementById('patient_name').value;
+        const pService = document.getElementById('service_type').value;
+        const pDept = document.getElementById('department').value;
+
+        if (!pName || !pService || !pDept) {
+            alert("يرجى تعبئة اسم المريض والخدمة والقسم أولاً قبل الطباعة.");
+            return;
+        }
+
+        setDateTime();
+        
+        document.getElementById('ticketPatientName').innerText = pName;
+        document.getElementById('ticketService').innerText = pService;
+        document.getElementById('ticketDept').innerText = pDept;
+        document.getElementById('ticketDateTime').innerText = document.getElementById('record_date').value + " " + document.getElementById('record_time').value;
+
+        // تجهيز نافذة الطباعة
+        const printArea = document.getElementById('printTicketArea');
+        printArea.style.display = 'block';
+        window.print();
+        printArea.style.display = 'none';
+
+        // ثم حفظ السجل بـ الحفظ فقط
+        submitOnlySave();
+        document.getElementById('recordForm').submit();
     }
 
     function openActionNote(recordId, patientName, currentAction) {
@@ -552,13 +597,8 @@
 
         fetch('/update_action', {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                record_id: recordId,
-                action_taken: actionText
-            })
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ record_id: recordId, action_taken: actionText })
         })
         .then(response => response.json())
         .then(data => {
