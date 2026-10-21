@@ -117,6 +117,28 @@ def logout():
     session.clear()
     return redirect(url_for("login"))
 
+@app.route("/check_national_id", methods=["POST"])
+def check_national_id():
+    """التحقق الفوري المباشر من وجود رقم الهوية مسبقاً قبل عملية الحفظ"""
+    if "user" not in session:
+        return jsonify({"exists": False})
+    
+    data = request.get_json()
+    national_id = data.get("national_id", "").strip()
+    
+    if not national_id or national_id == "-":
+        return jsonify({"exists": False})
+        
+    try:
+        check_res = supabase.table("support_unit_records").select("id, patient_name").eq("national_id", national_id).execute()
+        if check_res.data and len(check_res.data) > 0:
+            patient_name = check_res.data[0].get("patient_name", "مريض آخر")
+            return jsonify({"exists": True, "patient_name": patient_name})
+    except Exception as e:
+        print("خطأ أثناء فحص رقم الهوية:", e)
+        
+    return jsonify({"exists": False})
+
 @app.route("/", methods=["GET", "POST"])
 def index():
     if "user" not in session:
