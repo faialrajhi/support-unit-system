@@ -116,6 +116,7 @@ def logout():
 
 @app.route("/check_national_id", methods=["POST"])
 def check_national_id():
+    """التحقق اللحظي من وجود رقم الهوية مسبقاً قبل الحفظ"""
     if "user" not in session:
         return jsonify({"exists": False})
     
@@ -178,9 +179,6 @@ def index():
             "department": department,
             "target_employee": target_employee,
             "notes": "-",
-            "action_date": "-",
-            "action_time": "-",
-            "action_employee_name": "-",
             "employee_name": logged_emp_name,
             "record_date": form_data.get("record_date"),
             "record_time": form_data.get("record_time")
@@ -238,27 +236,40 @@ def index():
 
 @app.route("/update_action", methods=["POST"])
 def update_action():
-    """تحديث الإجراء المتخذ مع تاريخ ووقت واسم الموظف القائم بالإجراء"""
+    """تحديث الإجراء المتخذ وإضافة الملاحظة الجديدة لسجل الملاحظات السابق مع توثيق اسم الموظف/المشرف والوقت"""
     if "user" not in session or not session.get("can_edit", True):
         return jsonify({"success": False, "message": "غير مصرح لك"}), 403
 
     data = request.get_json()
     record_id = data.get("record_id")
-    action_taken = data.get("action_taken", "")
-    action_date = data.get("action_date", "")
-    action_time = data.get("action_time", "")
-    action_employee = data.get("action_employee", "")
+    new_action_text = data.get("action_taken", "").strip()
+    action_date = data.get("action_date", "").strip()
+    action_time = data.get("action_time", "").strip()
+    action_employee = data.get("action_employee", "").strip() or session.get("employee_name", "موظف")
 
-    update_payload = {
-        "notes": action_taken,
-        "action_date": action_date if action_date else "-",
-        "action_time": action_time if action_time else "-",
-        "action_employee_name": action_employee if action_employee else session.get("employee_name", "-")
-    }
+    if not new_action_text:
+        return jsonify({"success": False, "message": "يرجى كتابة الإجراء أو الملاحظة أولاً"}), 400
 
     try:
-        supabase.table("support_unit_records").update(update_payload).eq("id", record_id).execute()
+        # جلب الملاحظات المسجلة سابقاً
+        res = supabase.table("support_unit_records").select("notes").eq("id", record_id).execute()
+        current_notes = ""
+        if res.data and len(res.data) > 0:
+            current_notes = res.data[0].get("notes") or ""
+
+        # إعداد النص الموثق بالاسم والتاريخ والوقت
+        timestamp_header = f"📌 [{action_date} {action_time} | الموظف/المشرف: {action_employee}]"
+        new_entry = f"{timestamp_header}\n{new_action_text}"
+
+        # دمج الملاحظات الجديدة مع السابقة
+        if current_notes and current_notes.strip() != "-":
+            updated_notes = f"{new_entry}\n\n----------------------------------------\n\n{current_notes}"
+        else:
+            updated_notes = new_entry
+
+        supabase.table("support_unit_records").update({"notes": updated_notes}).eq("id", record_id).execute()
         return jsonify({"success": True})
+
     except Exception as e:
         return jsonify({"success": False, "message": str(e)}), 500
 
@@ -286,9 +297,6 @@ def export_excel():
             "department": "القسم",
             "target_employee": "الموظف المعني",
             "notes": "الاجراء المتخذ / الملاحظات",
-            "action_date": "تاريخ الإجراء",
-            "action_time": "وقت الإجراء",
-            "action_employee_name": "الموظف القائم بالإجراء",
             "employee_name": "موظف تجربة المريض",
             "record_date": "التاريخ",
             "record_time": "الوقت"
