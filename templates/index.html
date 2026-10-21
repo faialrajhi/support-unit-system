@@ -239,7 +239,7 @@
             background: #fff;
             border-radius: 8px;
             width: 90%;
-            max-width: 420px;
+            max-width: 460px;
             box-shadow: 0 10px 25px rgba(0,0,0,0.15);
             overflow: hidden;
             animation: modalFadeIn 0.2s ease-out;
@@ -259,11 +259,18 @@
         .modal-header h3 { font-size: 0.9rem; font-weight: 600; }
         .modal-close { background: transparent; border: none; color: white; font-size: 1.3rem; cursor: pointer; }
         .modal-body { padding: 16px; font-size: 0.85rem; color: #334155; }
-        .modal-patient-name { font-weight: 600; color: #164D6E; margin-bottom: 10px; font-size: 0.88rem; }
-        .modal-textarea { width: 100%; height: 100px; padding: 8px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 0.82rem; outline: none; resize: vertical; }
+        .modal-patient-name { font-weight: 600; color: #164D6E; margin-bottom: 12px; font-size: 0.88rem; }
+        .modal-textarea { width: 100%; height: 80px; padding: 8px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 0.82rem; outline: none; resize: vertical; }
         .modal-footer { padding: 10px 16px 12px; display: flex; gap: 8px; justify-content: flex-end; }
         .btn-modal-save { background: #164D6E; color: white; border: none; padding: 6px 16px; border-radius: 5px; font-weight: 600; cursor: pointer; font-size: 0.78rem; }
         .btn-modal-cancel { background: #64748b; color: white; border: none; padding: 6px 12px; border-radius: 5px; font-weight: 600; cursor: pointer; font-size: 0.78rem; }
+
+        .modal-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 10px;
+        }
 
         @media print {
             body * { visibility: hidden; }
@@ -324,7 +331,6 @@
                     <div class="mb-3">
                         <label for="national_id">رقم الهوية</label>
                         <input type="text" id="national_id" name="national_id" class="form-control" placeholder="10xxxxxxx" pattern="[0-9]{10}" maxlength="10" oninput="checkNationalIdExists()" onblur="checkNationalIdExists()">
-                        <!-- التنبيه الفوري لتكرار الهوية -->
                         <small id="nationalIdWarning" style="color: #dc2626; font-weight: 700; display: none; margin-top: 4px; font-size: 0.78rem;"></small>
                     </div>
 
@@ -468,7 +474,7 @@
                                 <td>
                                     <span class="patient-link" 
                                          title="انقر لتعديل أو عرض الإجراء المتخذ"
-                                         onclick="openActionNote('{{ record.get('id') }}', '{{ record.get('patient_name', '') }}', '{% if is_valid_note %}{{ note_text|e }}{% endif %}')">
+                                         onclick="openActionNote('{{ record.get('id') }}', '{{ record.get('patient_name', '') }}', '{% if is_valid_note %}{{ note_text|e }}{% endif %}', '{{ record.get('action_date', '') }}', '{{ record.get('action_time', '') }}', '{{ record.get('action_employee_name', '') }}')">
                                         {{ record.get('patient_name', '-') }} {% if is_valid_note %}📝{% endif %}
                                     </span>
                                 </td>
@@ -497,16 +503,37 @@
     </div>
 </div>
 
-<!-- النافذة المنبثقة للتعديل -->
+<!-- النافذة المنبثقة للتعديل المحدثة بخانات التاريخ والوقت واسم الموظف -->
 <div id="noteModal" class="modal-overlay" onclick="closeModalOnOverlay(event)">
     <div class="modal-card">
         <div class="modal-header">
-            <h3>الإجراء المتخذ / ملاحظات</h3>
+            <h3>تفاصيل الإجراء المتخذ</h3>
             <button class="modal-close" onclick="closeNoteModal()">&times;</button>
         </div>
         <div class="modal-body">
             <div class="modal-patient-name" id="modalPatientTitle"></div>
-            <textarea id="modalActionInput" class="modal-textarea" placeholder="اكتب الإجراء المتخذ للمريض هنا..."></textarea>
+            
+            <div class="mb-3">
+                <label for="modalActionInput">الإجراء المتخذ / ملاحظات:</label>
+                <textarea id="modalActionInput" class="modal-textarea" placeholder="اكتب الإجراء المتخذ للمريض هنا..."></textarea>
+            </div>
+
+            <div class="modal-grid">
+                <div>
+                    <label for="modalActionDate">تاريخ الإجراء:</label>
+                    <input type="date" id="modalActionDate" class="form-control">
+                </div>
+                <div>
+                    <label for="modalActionTime">وقت الإجراء:</label>
+                    <input type="time" id="modalActionTime" class="form-control">
+                </div>
+            </div>
+
+            <div class="mb-3" style="margin-top: 10px;">
+                <label for="modalActionEmployee">اسم الموظف القائم بالإجراء:</label>
+                <input type="text" id="modalActionEmployee" class="form-control" placeholder="اسم الموظف">
+            </div>
+
             <input type="hidden" id="modalRecordId">
         </div>
         <div class="modal-footer">
@@ -537,15 +564,15 @@
     </div>
 </div>
 
-<!-- مكتبة Supabase للتحديث اللحظي بدون مسح البيانات -->
+<!-- مكتبة Supabase للتحديث اللحظي -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
     const SUPABASE_URL = "https://urnawuapfkhxvqvepzit.supabase.co";
     const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVybmF3dWFwZmtoeHZxdmVweml0Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc4ODA5NTQxMCwiZXhwIjoyMTAzNjcxNDEwfQ.hg8Ki6qvoI_Fhammt_87t-HfTZPSdvl6nYn5bUtThzo";
     
     const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    const loggedUserDefault = "{{ logged_employee }}";
 
-    // دالة التحقق مما إذا كان الموظف يكتب حالياً في أحد الحقول لعدم تحديث الصفحة
     function isUserTyping() {
         const activeElement = document.activeElement;
         if (!activeElement) return false;
@@ -566,7 +593,6 @@
         )
         .subscribe();
 
-    // دالة فحص تكرار رقم الهوية الفوري في الصفحة
     function checkNationalIdExists() {
         const natIdInput = document.getElementById('national_id');
         const warningEl = document.getElementById('nationalIdWarning');
@@ -682,10 +708,20 @@
         document.getElementById('recordForm').submit();
     }
 
-    function openActionNote(recordId, patientName, currentAction) {
+    // فتح النافذة المنبثقة مع تعبئة التاريخ والوقت واسم الموظف تلقائياً
+    function openActionNote(recordId, patientName, currentAction, actionDate, actionTime, actionEmp) {
         document.getElementById('modalRecordId').value = recordId;
         document.getElementById('modalPatientTitle').innerText = "المريض: " + patientName;
         document.getElementById('modalActionInput').value = currentAction ? currentAction : "";
+
+        const now = new Date();
+        const todayDate = now.toISOString().split('T')[0];
+        const currentTime = String(now.getHours()).padStart(2, '0') + ':' + String(now.getMinutes()).padStart(2, '0');
+
+        document.getElementById('modalActionDate').value = (actionDate && actionDate !== '-') ? actionDate : todayDate;
+        document.getElementById('modalActionTime').value = (actionTime && actionTime !== '-') ? actionTime : currentTime;
+        document.getElementById('modalActionEmployee').value = (actionEmp && actionEmp !== '-') ? actionEmp : loggedUserDefault;
+
         document.getElementById('noteModal').style.display = 'flex';
     }
 
@@ -702,11 +738,20 @@
     function saveActionNote() {
         const recordId = document.getElementById('modalRecordId').value;
         const actionText = document.getElementById('modalActionInput').value;
+        const actionDate = document.getElementById('modalActionDate').value;
+        const actionTime = document.getElementById('modalActionTime').value;
+        const actionEmployee = document.getElementById('modalActionEmployee').value;
 
         fetch('/update_action', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ record_id: recordId, action_taken: actionText })
+            body: JSON.stringify({ 
+                record_id: recordId, 
+                action_taken: actionText,
+                action_date: actionDate,
+                action_time: actionTime,
+                action_employee: actionEmployee
+            })
         })
         .then(response => response.json())
         .then(data => {
