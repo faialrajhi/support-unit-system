@@ -112,7 +112,6 @@
             color: #1e293b;
         }
 
-        /* أزرار الإجراءات في نموذج الإدخال */
         .btn-group-actions {
             display: flex;
             flex-direction: column;
@@ -223,7 +222,6 @@
         }
         .patient-link:hover { color: #0f3750; }
 
-        /* النافذة المنبثقة والنوت */
         .modal-overlay {
             position: fixed;
             top: 0;
@@ -267,7 +265,6 @@
         .btn-modal-save { background: #164D6E; color: white; border: none; padding: 6px 16px; border-radius: 5px; font-weight: 600; cursor: pointer; font-size: 0.78rem; }
         .btn-modal-cancel { background: #64748b; color: white; border: none; padding: 6px 12px; border-radius: 5px; font-weight: 600; cursor: pointer; font-size: 0.78rem; }
 
-        /* تنسيق قالب تذكرة الطباعة المخفية */
         @media print {
             body * { visibility: hidden; }
             #printTicketArea, #printTicketArea * { visibility: visible; }
@@ -380,7 +377,6 @@
                         </select>
                     </div>
 
-                    <!-- خيارات الحفظ والطباعة والواتساب -->
                     <div class="btn-group-actions">
                         <button type="submit" onclick="submitWithWhatsapp()" class="btn-action btn-whatsapp">
                             💬 حفظ وإرسال واتساب
@@ -397,7 +393,7 @@
                 {% else %}
                 <h4 class="card-title">لوحة المشرف</h4>
                 <div class="supervisor-notice">
-                    أهلاً بك. حسابك بصلاحية <strong>مشرف</strong> للاطلاع ومراجعة السجلات فقط.
+                    أهلاً بك. حسابك بصلاحية <strong>مشرف</strong> للاطلاع ومراجعــة السجلات فقط.
                 </div>
                 {% endif %}
             </div>
@@ -435,6 +431,7 @@
                             <tr>
                                 <th>#</th>
                                 <th>اسم المريض</th>
+                                <th>رقم الجوال</th>
                                 <th>الهوية</th>
                                 <th>رقم الملف</th>
                                 <th>الخدمة المطلوبة</th>
@@ -457,6 +454,7 @@
                                         {{ record.get('patient_name', '-') }} {% if is_valid_note %}📝{% endif %}
                                     </span>
                                 </td>
+                                <td>{{ record.get('patient_phone', '-') }}</td>
                                 <td>{{ record.get('national_id', '-') }}</td>
                                 <td>{{ record.get('file_number', '-') }}</td>
                                 <td>{{ record.get('service_type', '-') }}</td>
@@ -467,7 +465,7 @@
                             </tr>
                             {% else %}
                             <tr>
-                                <td colspan="9" class="text-muted">لا توجد سجلات مضافة حالياً.</td>
+                                <td colspan="10" class="text-muted">لا توجد سجلات مضافة حالياً.</td>
                             </tr>
                             {% endfor %}
                         </tbody>
@@ -563,13 +561,11 @@
         document.getElementById('ticketDept').innerText = pDept;
         document.getElementById('ticketDateTime').innerText = document.getElementById('record_date').value + " " + document.getElementById('record_time').value;
 
-        // تجهيز نافذة الطباعة
         const printArea = document.getElementById('printTicketArea');
         printArea.style.display = 'block';
         window.print();
         printArea.style.display = 'none';
 
-        // ثم حفظ السجل بـ الحفظ فقط
         submitOnlySave();
         document.getElementById('recordForm').submit();
     }
