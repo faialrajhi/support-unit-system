@@ -21,7 +21,7 @@
         }
         .container {
             width: 100%;
-            max-width: 1500px;
+            max-width: 1550px;
             margin: 0 auto;
         }
         .header-banner {
@@ -377,6 +377,12 @@
                         </select>
                     </div>
 
+                    <!-- حقل الموظف المعني بالخدمة -->
+                    <div class="mb-3">
+                        <label for="target_employee">الموظف المعني (صاحب الخدمة)</label>
+                        <input type="text" id="target_employee" name="target_employee" class="form-control" placeholder="اسم الموظف المطلوب منه الخدمة">
+                    </div>
+
                     <div class="btn-group-actions">
                         <button type="submit" onclick="submitWithWhatsapp()" class="btn-action btn-whatsapp">
                             💬 حفظ وإرسال واتساب
@@ -393,7 +399,7 @@
                 {% else %}
                 <h4 class="card-title">لوحة المشرف</h4>
                 <div class="supervisor-notice">
-                    أهلاً بك. حسابك بصلاحية <strong>مشرف</strong> للاطلاع ومراجعــة السجلات فقط.
+                    أهلاً بك. حسابك بصلاحية <strong>مشرف</strong> للاطلاع ومراجعة السجلات فقط.
                 </div>
                 {% endif %}
             </div>
@@ -436,7 +442,8 @@
                                 <th>رقم الملف</th>
                                 <th>الخدمة المطلوبة</th>
                                 <th>القسم</th>
-                                <th>الموظف / القائم بالخدمة</th>
+                                <th>الموظف المعني</th>
+                                <th>الموظف المنسق</th>
                                 <th>التاريخ</th>
                                 <th>الوقت</th>
                             </tr>
@@ -459,13 +466,14 @@
                                 <td>{{ record.get('file_number', '-') }}</td>
                                 <td>{{ record.get('service_type', '-') }}</td>
                                 <td>{{ record.get('department', '-') }}</td>
+                                <td><strong>{{ record.get('target_employee', '-') }}</strong></td>
                                 <td>{{ record.get('employee_name', '-') }}</td>
                                 <td>{{ record.get('record_date', '-') }}</td>
                                 <td>{{ record.get('record_time', '-') }}</td>
                             </tr>
                             {% else %}
                             <tr>
-                                <td colspan="10" class="text-muted">لا توجد سجلات مضافة حالياً.</td>
+                                <td colspan="11" class="text-muted">لا توجد سجلات مضافة حالياً.</td>
                             </tr>
                             {% endfor %}
                         </tbody>
@@ -509,8 +517,9 @@
             <strong>اسم المريض:</strong> <span id="ticketPatientName">-</span><br>
             <strong>الخدمة المطلوبة:</strong> <span id="ticketService">-</span><br>
             <strong>القسم:</strong> <span id="ticketDept">-</span><br>
+            <strong>الموظف المعني:</strong> <span id="ticketTargetEmp">-</span><br>
             <strong>التاريخ والوقت:</strong> <span id="ticketDateTime">-</span><br>
-            <strong>الموظف:</strong> <span>{{ logged_employee }}</span>
+            <strong>الموظف المنسق:</strong> <span>{{ logged_employee }}</span>
         </div>
         <hr style="border: 0.5px solid #ccc; margin: 10px 0;">
         <p style="font-size: 10px; color: #777;">نتمنى لك دوام الصحة والعافية</p>
@@ -548,6 +557,7 @@
         const pName = document.getElementById('patient_name').value;
         const pService = document.getElementById('service_type').value;
         const pDept = document.getElementById('department').value;
+        const pTargetEmp = document.getElementById('target_employee').value || "-";
 
         if (!pName || !pService || !pDept) {
             alert("يرجى تعبئة اسم المريض والخدمة والقسم أولاً قبل الطباعة.");
@@ -559,6 +569,7 @@
         document.getElementById('ticketPatientName').innerText = pName;
         document.getElementById('ticketService').innerText = pService;
         document.getElementById('ticketDept').innerText = pDept;
+        document.getElementById('ticketTargetEmp').innerText = pTargetEmp;
         document.getElementById('ticketDateTime').innerText = document.getElementById('record_date').value + " " + document.getElementById('record_time').value;
 
         const printArea = document.getElementById('printTicketArea');
