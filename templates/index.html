@@ -291,6 +291,7 @@
         .modal-textarea { width: 100%; height: 75px; padding: 8px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 0.82rem; outline: none; resize: vertical; }
         .modal-footer { padding: 10px 16px 12px; display: flex; gap: 8px; justify-content: flex-end; }
         .btn-modal-save { background: #164D6E; color: white; border: none; padding: 6px 16px; border-radius: 5px; font-weight: 600; cursor: pointer; font-size: 0.78rem; }
+        .btn-modal-print { background: #0284c7; color: white; border: none; padding: 6px 14px; border-radius: 5px; font-weight: 600; cursor: pointer; font-size: 0.78rem; display: inline-flex; align-items: center; gap: 4px; }
         .btn-modal-cancel { background: #64748b; color: white; border: none; padding: 6px 12px; border-radius: 5px; font-weight: 600; cursor: pointer; font-size: 0.78rem; }
 
         .modal-grid {
@@ -302,14 +303,13 @@
 
         @media print {
             body * { visibility: hidden; }
-            #printTicketArea, #printTicketArea * { visibility: visible; }
-            #printTicketArea {
+            #printTicketArea, #printTicketArea *, #printActionArea, #printActionArea * { visibility: visible; }
+            #printTicketArea, #printActionArea {
                 position: absolute;
                 left: 0;
                 top: 0;
-                width: 80mm;
-                padding: 10px;
-                text-align: center;
+                width: 100%;
+                padding: 15px;
                 font-family: 'IBM Plex Sans Arabic', sans-serif !important;
             }
         }
@@ -501,10 +501,13 @@
                             <tr>
                                 <td><strong>{{ ticket_num }}</strong></td>
                                 <td>
-                                    <!-- الاستعانة بـ data-notes لتفادي أخطاء الأسطر الجديدة -->
                                     <span class="patient-link" 
                                           data-id="{{ record.get('id') }}"
                                           data-name="{{ record.get('patient_name', '')|e }}"
+                                          data-national-id="{{ record.get('national_id', '-')|e }}"
+                                          data-file-num="{{ record.get('file_number', '-')|e }}"
+                                          data-service="{{ record.get('service_type', '-')|e }}"
+                                          data-dept="{{ record.get('department', '-')|e }}"
                                           data-notes="{{ note_text|e }}"
                                           title="انقر لإضافة إجراء أو عرض سجل الملاحظات"
                                           onclick="openActionNoteFromEl(this)">
@@ -522,7 +525,7 @@
                                 <td>
                                     <button type="button" class="btn-reprint" 
                                             onclick="reprintTicket('{{ ticket_num }}', '{{ record.get('patient_name', '-')|e }}', '{{ record.get('service_type', '-')|e }}', '{{ record.get('department', '-')|e }}', '{{ record.get('target_employee', '-')|e }}', '{{ record.get('employee_name', '-')|e }}', '{{ record.get('record_date', '') }}', '{{ record.get('record_time', '') }}')">
-                                         طباعة التذكرة
+                                        🖨️ طباعة
                                     </button>
                                 </td>
                             </tr>
@@ -541,7 +544,7 @@
     </div>
 </div>
 
-<!-- النافذة المنبثقة المحدثة -->
+<!-- النافذة المنبثقة للتعديل وبها زر الطباعة -->
 <div id="noteModal" class="modal-overlay" onclick="closeModalOnOverlay(event)">
     <div class="modal-card">
         <div class="modal-header">
@@ -576,8 +579,13 @@
             </div>
 
             <input type="hidden" id="modalRecordId">
+            <input type="hidden" id="modalPatientNatId">
+            <input type="hidden" id="modalPatientFileNum">
+            <input type="hidden" id="modalPatientService">
+            <input type="hidden" id="modalPatientDept">
         </div>
         <div class="modal-footer">
+            <button type="button" class="btn-modal-print" onclick="printActionReport()">🖨️ طباعة الإجراءات</button>
             <button type="button" class="btn-modal-save" onclick="saveActionNote()">إضافة الملاحظة</button>
             <button type="button" class="btn-modal-cancel" onclick="closeNoteModal()">إلغاء</button>
         </div>
@@ -602,6 +610,37 @@
         </div>
         <hr style="border: 0.5px solid #ccc; margin: 10px 0;">
         <p style="font-size: 10px; color: #777;">نتمنى لك دوام الصحة والعافية</p>
+    </div>
+</div>
+
+<!-- منطقة طباعة تقرير الإجراء المتخذ -->
+<div id="printActionArea" style="display:none;">
+    <div style="border: 2px solid #164D6E; padding: 20px; border-radius: 8px; font-family: sans-serif; background: #fff;">
+        <div style="text-align: center; border-bottom: 2px solid #164D6E; padding-bottom: 10px; margin-bottom: 15px;">
+            <h2 style="color: #164D6E; margin: 0 0 5px 0;">تقرير الإجراءات والملاحظات المتخذة</h2>
+            <p style="margin: 0; font-size: 13px; color: #555;">إدارة تجربة المريض - وحدة الدعم المساندة</p>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; font-size: 13px; margin-bottom: 15px; background: #f8fafc; padding: 10px; border-radius: 6px;">
+            <div><strong>اسم المريض:</strong> <span id="reportPatientName">-</span></div>
+            <div><strong>رقم الهوية:</strong> <span id="reportNationalId">-</span></div>
+            <div><strong>رقم الملف:</strong> <span id="reportFileNum">-</span></div>
+            <div><strong>الخدمة المطلوبة:</strong> <span id="reportService">-</span></div>
+            <div><strong>القسم المعني:</strong> <span id="reportDept">-</span></div>
+            <div><strong>تاريخ الطباعة:</strong> <span id="reportPrintDate">-</span></div>
+        </div>
+
+        <hr style="border: 0.5px solid #cbd5e1; margin-bottom: 15px;">
+
+        <h4 style="color: #164D6E; margin-bottom: 8px;">تفاصيل السجل والإجراءات:</h4>
+        <div id="reportNotesBody" style="white-space: pre-wrap; font-size: 12px; line-height: 1.6; border: 1px solid #cbd5e1; padding: 12px; border-radius: 6px; background: #fafafa;">
+            لا توجد ملاحظات مدونة.
+        </div>
+
+        <div style="margin-top: 30px; display: flex; justify-content: space-between; font-size: 12px; font-weight: bold; color: #333;">
+            <div>توقيع الموظف / المشرف: ............................</div>
+            <div>ختم القسم: ............................</div>
+        </div>
     </div>
 </div>
 
@@ -765,7 +804,6 @@
         printArea.style.display = 'none';
     }
 
-    // قراءة البيانات من عنصر المريض بآمان
     function openActionNoteFromEl(el) {
         const recordId = el.getAttribute('data-id');
         const patientName = el.getAttribute('data-name');
@@ -775,6 +813,11 @@
         document.getElementById('modalPatientTitle').innerText = "المريض: " + patientName;
         document.getElementById('modalHistoryBox').innerText = (previousNotes && previousNotes.trim() !== '' && previousNotes !== '-') ? previousNotes : "لا توجد ملاحظات سابقة.";
         document.getElementById('modalActionInput').value = "";
+
+        document.getElementById('modalPatientNatId').value = el.getAttribute('data-national-id') || '-';
+        document.getElementById('modalPatientFileNum').value = el.getAttribute('data-file-num') || '-';
+        document.getElementById('modalPatientService').value = el.getAttribute('data-service') || '-';
+        document.getElementById('modalPatientDept').value = el.getAttribute('data-dept') || '-';
 
         const now = new Date();
         const todayDate = now.toISOString().split('T')[0];
@@ -795,6 +838,50 @@
         if (event.target.id === 'noteModal') {
             closeNoteModal();
         }
+    }
+
+    // دالة طباعة تقرير الإجراءات والملاحظات
+    function printActionReport() {
+        const pName = document.getElementById('modalPatientTitle').innerText.replace('المريض: ', '');
+        const natId = document.getElementById('modalPatientNatId').value;
+        const fileNum = document.getElementById('modalPatientFileNum').value;
+        const service = document.getElementById('modalPatientService').value;
+        const dept = document.getElementById('modalPatientDept').value;
+        const historyText = document.getElementById('modalHistoryBox').innerText;
+        const newText = document.getElementById('modalActionInput').value.trim();
+
+        let fullContent = "";
+        
+        // دمج الملاحظة الجديدة إذا كتبت مع الملاحظات القديمة في الصفحة المطبوعة
+        if (newText) {
+            const dateVal = document.getElementById('modalActionDate').value;
+            const timeVal = document.getElementById('modalActionTime').value;
+            const empVal = document.getElementById('modalActionEmployee').value;
+            const newEntry = `📌 [${dateVal} ${timeVal} | الموظف/المشرف: ${empVal}]\n${newText}`;
+
+            if (historyText && historyText !== "لا توجد ملاحظات سابقة.") {
+                fullContent = `${newEntry}\n\n----------------------------------------\n\n${historyText}`;
+            } else {
+                fullContent = newEntry;
+            }
+        } else {
+            fullContent = historyText;
+        }
+
+        document.getElementById('reportPatientName').innerText = pName;
+        document.getElementById('reportNationalId').innerText = natId;
+        document.getElementById('reportFileNum').innerText = fileNum;
+        document.getElementById('reportService').innerText = service;
+        document.getElementById('reportDept').innerText = dept;
+        
+        const now = new Date();
+        document.getElementById('reportPrintDate').innerText = now.toLocaleDateString('ar-SA') + ' ' + now.toLocaleTimeString('ar-SA');
+        document.getElementById('reportNotesBody').innerText = fullContent;
+
+        const printArea = document.getElementById('printActionArea');
+        printArea.style.display = 'block';
+        window.print();
+        printArea.style.display = 'none';
     }
 
     function saveActionNote() {
