@@ -129,6 +129,7 @@ def index():
             "file_number": form_data.get("file_number", "-"),
             "service_type": service_type,
             "department": form_data.get("department"),
+            "target_employee": form_data.get("target_employee", "-"), # الموظف المعني بالخدمة
             "notes": "-",
             "employee_name": logged_emp_name,
             "record_date": form_data.get("record_date"),
@@ -137,7 +138,7 @@ def index():
         try:
             supabase.table("support_unit_records").insert(record).execute()
 
-            # إرسال التنبيه التلقائي للمريض عبر Green API فقط في حال اختيار زر الواتساب
+            # إرسال التنبيه التلقائي للمريض عبر Green API عند اختيار زر الواتساب
             if send_whatsapp == "yes":
                 send_whatsapp_green_api(patient_phone, patient_name, service_type)
 
@@ -215,8 +216,9 @@ def export_excel():
             "file_number": "رقم الملف",
             "service_type": "الخدمة المطلوبة",
             "department": "القسم",
+            "target_employee": "الموظف المعني",
             "notes": "الاجراء المتخذ / الملاحظات",
-            "employee_name": "الموظف المسؤول",
+            "employee_name": "الموظف المنسق (كاتب السجل)",
             "record_date": "التاريخ",
             "record_time": "الوقت"
         }
