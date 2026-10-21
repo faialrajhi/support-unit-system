@@ -21,10 +21,8 @@ def send_whatsapp_green_api(phone, patient_name, service_type, national_id, depa
     if not phone or str(phone).strip() in ["-", ""]:
         return
 
-    # استخراج الأرقام فقط وحذف أي مسافات أو رموز
     clean_phone = re.sub(r'\D', '', str(phone).strip())
 
-    # تحويل الرقم إلى الصيغة الدولية السعودية (966)
     if clean_phone.startswith("05"):
         clean_phone = "966" + clean_phone[1:]
     elif clean_phone.startswith("5") and len(clean_phone) == 9:
@@ -34,7 +32,6 @@ def send_whatsapp_green_api(phone, patient_name, service_type, national_id, depa
 
     url = f"https://api.green-api.com/waInstance{GREEN_API_INSTANCE_ID}/sendMessage/{GREEN_API_TOKEN}"
 
-    # إعداد نص الرسالة بتنسيق المباشر المحدد
     lines = [
         f"اسم المستفيد: {patient_name or '-'}",
         f"رقم الهوية: {national_id or '-'}",
@@ -119,7 +116,6 @@ def logout():
 
 @app.route("/check_national_id", methods=["POST"])
 def check_national_id():
-    """التحقق الفوري المباشر من وجود رقم الهوية مسبقاً قبل عملية الحفظ"""
     if "user" not in session:
         return jsonify({"exists": False})
     
@@ -152,7 +148,6 @@ def index():
         username = session.get("user", "")
         logged_emp_name = session.get("employee_name", "موظف النظام")
 
-        # إذا كان الحساب يخص متطوع أو متدرب، يتم دمج اسمه الفعلي المدخل مع اسم الحساب
         if username in VOLUNTEER_ACCOUNTS:
             actual_name = form_data.get("actual_volunteer_name", "").strip()
             if actual_name:
@@ -166,7 +161,6 @@ def index():
         target_employee = form_data.get("target_employee", "-")
         send_whatsapp = form_data.get("send_whatsapp_flag", "yes")
 
-        # منع تكرار رقم الهوية
         if national_id and national_id != "-":
             try:
                 check_res = supabase.table("support_unit_records").select("id").eq("national_id", national_id).execute()
@@ -184,6 +178,9 @@ def index():
             "department": department,
             "target_employee": target_employee,
             "notes": "-",
+            "action_date": "-",
+            "action_time": "-",
+            "action_employee_name": "-",
             "employee_name": logged_emp_name,
             "record_date": form_data.get("record_date"),
             "record_time": form_data.get("record_time")
@@ -191,7 +188,6 @@ def index():
         try:
             supabase.table("support_unit_records").insert(record).execute()
 
-            # إرسال التنبيه التلقائي للمريض عبر Green API عند اختيار الإرسال
             if send_whatsapp == "yes":
                 send_whatsapp_green_api(
                     phone=patient_phone,
@@ -242,16 +238,26 @@ def index():
 
 @app.route("/update_action", methods=["POST"])
 def update_action():
-    """تحديث الإجراء المتخذ عند النقر على اسم المريض وتأكيد الحفظ"""
+    """تحديث الإجراء المتخذ مع تاريخ ووقت واسم الموظف القائم بالإجراء"""
     if "user" not in session or not session.get("can_edit", True):
         return jsonify({"success": False, "message": "غير مصرح لك"}), 403
 
     data = request.get_json()
     record_id = data.get("record_id")
     action_taken = data.get("action_taken", "")
+    action_date = data.get("action_date", "")
+    action_time = data.get("action_time", "")
+    action_employee = data.get("action_employee", "")
+
+    update_payload = {
+        "notes": action_taken,
+        "action_date": action_date if action_date else "-",
+        "action_time": action_time if action_time else "-",
+        "action_employee_name": action_employee if action_employee else session.get("employee_name", "-")
+    }
 
     try:
-        supabase.table("support_unit_records").update({"notes": action_taken}).eq("id", record_id).execute()
+        supabase.table("support_unit_records").update(update_payload).eq("id", record_id).execute()
         return jsonify({"success": True})
     except Exception as e:
         return jsonify({"success": False, "message": str(e)}), 500
@@ -280,6 +286,9 @@ def export_excel():
             "department": "القسم",
             "target_employee": "الموظف المعني",
             "notes": "الاجراء المتخذ / الملاحظات",
+            "action_date": "تاريخ الإجراء",
+            "action_time": "وقت الإجراء",
+            "action_employee_name": "الموظف القائم بالإجراء",
             "employee_name": "موظف تجربة المريض",
             "record_date": "التاريخ",
             "record_time": "الوقت"
