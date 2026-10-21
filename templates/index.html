@@ -303,6 +303,15 @@
                 <h4 class="card-title">لوحة إدخال البيانات</h4>
 
                 <form id="recordForm" action="/" method="POST" onsubmit="setDateTime()">
+                    
+                    <!-- خانة إدخال الاسم الفعلي للمتطوع أو المتدرب تظهر حصرياً لحساباتهم -->
+                    {% if is_volunteer %}
+                    <div class="mb-3" style="background: #fdf2f8; border: 1px solid #f472b6; padding: 10px; border-radius: 6px;">
+                        <label for="actual_volunteer_name" style="color: #be185d; font-weight: 700;">اسم المتطوع / المتدرب الفعلي (إلزامي):</label>
+                        <input type="text" id="actual_volunteer_name" name="actual_volunteer_name" class="form-control" placeholder="أدخل اسمك الثلاثي الكريم هنا..." required style="border-color: #f472b6;">
+                    </div>
+                    {% endif %}
+
                     <div class="mb-3">
                         <label for="patient_name">اسم المريض</label>
                         <input type="text" id="patient_name" name="patient_name" class="form-control" placeholder="اسم المريض" required>
@@ -332,6 +341,7 @@
                         <select id="service_type" name="service_type" class="form-select" required>
                             <option value="" selected disabled>اختر الخدمة المطلوبة</option>
                             <option value="تصريح صعود">تصريح صعود</option>
+                            <option value="استلام وصفة">استلام وصفة</option>
                             <option value="طلب مقابلة طبيب">طلب مقابلة طبيب</option>
                             <option value="طلب صرف دواء">طلب صرف دواء</option>
                             <option value="موعد جديد عيادات">موعد جديد عيادات</option>
@@ -343,7 +353,7 @@
                             <option value="عدم ظهور الادوية في النظام">عدم ظهور الادوية في النظام</option>
                             <option value="طلب مرافقة جديد">طلب مرافقة جديد</option>
                             <option value="اعادة طلب مرافقة">اعادة طلب مرافقة</option>
-                            <option value="شكوي ضد موظف">شكوى ضد موظف</option>
+                            <option value="شكوى ضد موظف">شكوى ضد موظف</option>
                             <option value="شكوى من خدمة">شكوى من خدمة</option>
                         </select>
                     </div>
@@ -443,7 +453,7 @@
                                 <th>الخدمة المطلوبة</th>
                                 <th>القسم</th>
                                 <th>الموظف المعني</th>
-                                <th>الموظف المنسق</th>
+                                <th>موظف تجربة المريض</th>
                                 <th>التاريخ</th>
                                 <th>الوقت</th>
                             </tr>
@@ -456,8 +466,8 @@
                                 <td><strong>{{ loop.index }}</strong></td>
                                 <td>
                                     <span class="patient-link" 
-                                          title="انقر لتعديل أو عرض الإجراء المتخذ"
-                                          onclick="openActionNote('{{ record.get('id') }}', '{{ record.get('patient_name', '') }}', '{% if is_valid_note %}{{ note_text|e }}{% endif %}')">
+                                         title="انقر لتعديل أو عرض الإجراء المتخذ"
+                                         onclick="openActionNote('{{ record.get('id') }}', '{{ record.get('patient_name', '') }}', '{% if is_valid_note %}{{ note_text|e }}{% endif %}')">
                                         {{ record.get('patient_name', '-') }} {% if is_valid_note %}📝{% endif %}
                                     </span>
                                 </td>
@@ -519,7 +529,7 @@
             <strong>القسم:</strong> <span id="ticketDept">-</span><br>
             <strong>الموظف المعني:</strong> <span id="ticketTargetEmp">-</span><br>
             <strong>التاريخ والوقت:</strong> <span id="ticketDateTime">-</span><br>
-            <strong>الموظف المنسق:</strong> <span>{{ logged_employee }}</span>
+            <strong>موظف تجربة المريض:</strong> <span>{{ logged_employee }}</span>
         </div>
         <hr style="border: 0.5px solid #ccc; margin: 10px 0;">
         <p style="font-size: 10px; color: #777;">نتمنى لك دوام الصحة والعافية</p>
