@@ -1,6 +1,7 @@
 from datetime import datetime, timedelta
 import io
 import os
+import requests
 from flask import Flask, jsonify, redirect, render_template, request, send_file, url_for, session
 import pandas as pd
 from supabase import Client, create_client
@@ -8,6 +9,49 @@ from supabase import Client, create_client
 app = Flask(__name__)
 app.secret_key = os.environ.get("FLASK_SECRET_KEY", "support_unit_secret_key_2026")
 
+# =========================
+# Green API Configuration
+# =========================
+GREEN_API_INSTANCE_ID = os.environ.get("GREEN_API_INSTANCE_ID", "710722772629")
+GREEN_API_TOKEN = os.environ.get("GREEN_API_TOKEN", "2e2ff31ea0b24f838a230552e4acabd61fd93c37be6d408ebd")
+
+def send_whatsapp_green_api(phone, patient_name, service_type):
+    """دالة لإرسال رسالة واتساب تلقائية للمريض عبر Green API"""
+    if not phone or phone.strip() in ["-", ""]:
+        return
+
+    # تنظيف وتنسيق رقم الجوال للصيغة الدولية (مثل: 0512345678 -> 966512345678)
+    clean_phone = phone.strip()
+    if clean_phone.startswith("05"):
+        clean_phone = "966" + clean_phone[1:]
+    elif clean_phone.startswith("5"):
+        clean_phone = "966" + clean_phone
+    elif clean_phone.startswith("+"):
+        clean_phone = clean_phone[1:]
+
+    url = f"https://api.green-api.com/waInstance{GREEN_API_INSTANCE_ID}/sendMessage/{GREEN_API_TOKEN}"
+
+    message_text = (
+        f"عزيزي المريض {patient_name}،\n\n"
+        f"تم تسجيل طلبك ({service_type}) بنجاح لدى وحدة الدعم المساندة.\n"
+        f"نعمل على متابعة طلبك وخدمتك في أقرب وقت.\n\n"
+        f"نتمنى لك دوام الصحة والعافية 🌸"
+    )
+
+    payload = {
+        "chatId": f"{clean_phone}@c.us",
+        "message": message_text
+    }
+    headers = {'Content-Type': 'application/json'}
+
+    try:
+        requests.post(url, json=payload, headers=headers, timeout=5)
+    except Exception as e:
+        print("خطأ أثناء إرسال رسالة الواتساب عبر Green API:", e)
+
+# =========================
+# قائمة المستخدمين
+# =========================
 USERS = {
     "turky": {"password": "123", "name": "تركي عبدالعزيز", "role": "admin", "title": "مدير النظام", "can_edit": True},
     "mohd": {"password": "123", "name": "محمد", "role": "employee", "title": "مشرف / موظف دعم", "can_edit": True},
@@ -60,11 +104,15 @@ def index():
         form_data = request.form
         logged_emp_name = session.get("employee_name", "موظف النظام")
 
+        patient_name = form_data.get("patient_name")
+        patient_phone = form_data.get("patient_phone", "-")
+        service_type = form_data.get("service_type")
+
         record = {
-            "patient_name": form_data.get("patient_name"),
+            "patient_name": patient_name,
             "national_id": form_data.get("national_id", "-"),
             "file_number": form_data.get("file_number", "-"),
-            "service_type": form_data.get("service_type"),
+            "service_type": service_type,
             "department": form_data.get("department"),
             "notes": "-",
             "employee_name": logged_emp_name,
@@ -73,6 +121,10 @@ def index():
         }
         try:
             supabase.table("support_unit_records").insert(record).execute()
+
+            # إرسال التنبيه التلقائي للمريض عبر Green API
+            send_whatsapp_green_api(patient_phone, patient_name, service_type)
+
             return redirect(url_for("index"))
         except Exception as e:
             return jsonify({"success": False, "message": str(e)}), 500
