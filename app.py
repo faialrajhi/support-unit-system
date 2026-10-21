@@ -20,7 +20,7 @@ def send_whatsapp_green_api(phone, patient_name, service_type):
     if not phone or phone.strip() in ["-", ""]:
         return
 
-    # تنظيف وتنسيق رقم الجوال للصيغة الدولية (مثال: 0512345678 -> 966512345678)
+    # تنظيف وتنسيق رقم الجوال للصيغة الدولية (مثل: 0512345678 -> 966512345678)
     clean_phone = phone.strip()
     if clean_phone.startswith("05"):
         clean_phone = "966" + clean_phone[1:]
@@ -124,6 +124,7 @@ def index():
 
         record = {
             "patient_name": patient_name,
+            "patient_phone": patient_phone,
             "national_id": form_data.get("national_id", "-"),
             "file_number": form_data.get("file_number", "-"),
             "service_type": service_type,
@@ -209,6 +210,7 @@ def export_excel():
         rename_map = {
             "id": "#",
             "patient_name": "اسم المريض",
+            "patient_phone": "رقم الجوال",
             "national_id": "رقم الهوية",
             "file_number": "رقم الملف",
             "service_type": "الخدمة المطلوبة",
