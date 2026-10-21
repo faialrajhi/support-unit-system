@@ -38,7 +38,7 @@
             min-height: 60px;
         }
         .header-banner img {
-            height: 42px;
+            height: 200px;
             width: auto;
             position: absolute;
             right: 20px;
@@ -309,7 +309,7 @@
                     </div>
 
                     <div class="mb-3">
-                        <label for="patient_phone">رقم الجوال (لإرسال إشعار الواتساب)</label>
+                        <label for="patient_phone">رقم الجوال:</label>
                         <input type="text" id="patient_phone" name="patient_phone" class="form-control" placeholder="05xxxxxxxx" pattern="05[0-9]{8}" maxlength="10">
                     </div>
 
@@ -343,7 +343,7 @@
                             <option value="عدم ظهور الادوية في النظام">عدم ظهور الادوية في النظام</option>
                             <option value="طلب مرافقة جديد">طلب مرافقة جديد</option>
                             <option value="اعادة طلب مرافقة">اعادة طلب مرافقة</option>
-                            <option value="شكوي ضد موظف">شكوي ضد موظف</option>
+                            <option value="شكوي ضد موظف">شكوى ضد موظف</option>
                             <option value="شكوى من خدمة">شكوى من خدمة</option>
                         </select>
                     </div>
@@ -379,19 +379,19 @@
                     </div>
 
                     <div class="mb-3">
-                        <label for="target_employee">الموظف المعني (صاحب الخدمة)</label>
+                        <label for="target_employee">الموظف المعني</label>
                         <input type="text" id="target_employee" name="target_employee" class="form-control" placeholder="اسم الموظف المطلوب منه الخدمة">
                     </div>
 
                     <div class="btn-group-actions">
                         <button type="submit" onclick="submitWithWhatsapp()" class="btn-action btn-whatsapp">
-                            💬 حفظ وإرسال واتساب
+                             حفظ وإرسال واتساب
                         </button>
                         <button type="button" onclick="submitAndPrintTicket()" class="btn-action btn-print">
-                            🖨️ حفظ وطباعة تذكرة الانتظار
+                             حفظ وطباعة تذكرة الانتظار
                         </button>
                         <button type="submit" onclick="submitOnlySave()" class="btn-action btn-save-only">
-                            💾 حفظ بالسجل فقط
+                            حفظ بالسجل فقط
                         </button>
                     </div>
                 </form>
@@ -408,12 +408,12 @@
         <!-- جدول السجلات -->
         <div class="table-container">
             <div class="card">
-                <h4 class="card-title">آخر السجلات المسجلة (الشفت الحالي)</h4>
+                <h4 class="card-title">آخر السجلات المسجلة</h4>
 
                 <form method="GET" action="/" class="filter-bar">
                     <div class="filter-group">
-                        <label>رقم الهوية (بحث شامل):</label>
-                        <input type="text" name="search_id" value="{{ request.args.get('search_id', '') }}" placeholder="ابحث بالحوية..." class="filter-input filter-input-id">
+                        <label>رقم الهوية:</label>
+                        <input type="text" name="search_id" value="{{ request.args.get('search_id', '') }}" placeholder="ابحث بالهوية..." class="filter-input filter-input-id">
                     </div>
 
                     <div class="filter-group">
