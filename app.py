@@ -138,11 +138,20 @@ def index():
 
         patient_name = form_data.get("patient_name")
         patient_phone = form_data.get("patient_phone", "-")
-        national_id = form_data.get("national_id", "-")
+        national_id = form_data.get("national_id", "-").strip()
         service_type = form_data.get("service_type")
         department = form_data.get("department")
         target_employee = form_data.get("target_employee", "-")
         send_whatsapp = form_data.get("send_whatsapp_flag", "yes")
+
+        # منع تكرار رقم الهوية
+        if national_id and national_id != "-":
+            try:
+                check_res = supabase.table("support_unit_records").select("id").eq("national_id", national_id).execute()
+                if check_res.data and len(check_res.data) > 0:
+                    return f"<script>alert('رقم الهوية ({national_id}) مسجل مسبقاً لمريض آخر ولا يمكن تكراره!'); window.history.back();</script>", 400
+            except Exception as e:
+                print("خطأ أثناء التحقق من رقم الهوية:", e)
 
         record = {
             "patient_name": patient_name,
