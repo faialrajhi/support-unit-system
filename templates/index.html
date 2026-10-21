@@ -463,7 +463,8 @@
                             {% set note_text = record.get('notes', '') %}
                             {% set is_valid_note = note_text and note_text.strip() != '' and note_text.strip() != '-' %}
                             <tr>
-                                <td><strong>{{ loop.index }}</strong></td>
+                                <!-- تعديل الترقيم ليظهر تنازلياً: الرقم الأعلى للسجل الأحدث بالعلى -->
+                                <td><strong>{{ records|length - loop.index0 }}</strong></td>
                                 <td>
                                     <span class="patient-link" 
                                          title="انقر لتعديل أو عرض الإجراء المتخذ"
@@ -536,7 +537,31 @@
     </div>
 </div>
 
+<!-- مكتبة Supabase للتحديث اللحظي المباشر -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
+    const SUPABASE_URL = "https://urnawuapfkhxvqvepzit.supabase.co";
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVybmF3dWFwZmtoeHZxdmVweml0Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc4ODA5NTQxMCwiZXhwIjoyMTAzNjcxNDEwfQ.hg8Ki6qvoI_Fhammt_87t-HfTZPSdvl6nYn5bUtThzo";
+    
+    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    // الاستماع اللحظي لأي تغيير بجدول السجلات لتحديث الشاشة فوراً عند الجميع
+    supabaseClient
+        .channel('support_unit_realtime')
+        .on(
+            'postgres_changes',
+            { event: '*', schema: 'public', table: 'support_unit_records' },
+            (payload) => {
+                window.location.reload();
+            }
+        )
+        .subscribe();
+
+    // تحديث الشاشة الاحتياطي كل 15 ثانية للضمان
+    setInterval(function() {
+        window.location.reload();
+    }, 15000);
+
     function setDateTime() {
         const now = new Date();
         const date = [
