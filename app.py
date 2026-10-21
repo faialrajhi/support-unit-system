@@ -20,7 +20,7 @@ def send_whatsapp_green_api(phone, patient_name, service_type):
     if not phone or phone.strip() in ["-", ""]:
         return
 
-    # تنظيف وتنسيق رقم الجوال للصيغة الدولية (مثل: 0512345678 -> 966512345678)
+    # تنظيف وتنسيق رقم الجوال للصيغة الدولية (مثال: 0512345678 -> 966512345678)
     clean_phone = phone.strip()
     if clean_phone.startswith("05"):
         clean_phone = "966" + clean_phone[1:]
@@ -70,7 +70,7 @@ USERS = {
     "fowzi": {"password": "123", "name": "فوزي بليلة", "role": "employee", "title": "موظف دعم", "can_edit": True},
     "rami": {"password": "123", "name": "رامي اللقماني", "role": "employee", "title": "موظف دعم", "can_edit": True},
 
-    # حسابات المتطوعين والمتدربين المضافة حديثاً
+    # حسابات المتطوعين والمتدربين
     "tatwa1": {"password": "123", "name": "تطوع1", "role": "employee", "title": "متطوع", "can_edit": True},
     "tatwa2": {"password": "123", "name": "تطوع2", "role": "employee", "title": "متطوع", "can_edit": True},
     "tamheer1": {"password": "123", "name": "تمهير1", "role": "employee", "title": "متدرب تمهير", "can_edit": True},
@@ -120,6 +120,7 @@ def index():
         patient_name = form_data.get("patient_name")
         patient_phone = form_data.get("patient_phone", "-")
         service_type = form_data.get("service_type")
+        send_whatsapp = form_data.get("send_whatsapp_flag", "yes")
 
         record = {
             "patient_name": patient_name,
@@ -135,8 +136,9 @@ def index():
         try:
             supabase.table("support_unit_records").insert(record).execute()
 
-            # إرسال التنبيه التلقائي للمريض عبر Green API
-            send_whatsapp_green_api(patient_phone, patient_name, service_type)
+            # إرسال التنبيه التلقائي للمريض عبر Green API فقط في حال اختيار زر الواتساب
+            if send_whatsapp == "yes":
+                send_whatsapp_green_api(patient_phone, patient_name, service_type)
 
             return redirect(url_for("index"))
         except Exception as e:
