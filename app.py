@@ -89,6 +89,8 @@ USERS = {
     "tadreeb2": {"password": "123", "name": "تدريب2", "role": "employee", "title": "متدرب", "can_edit": True}
 }
 
+VOLUNTEER_ACCOUNTS = ["tatwa1", "tatwa2", "tamheer1", "tamheer2", "tadreeb1", "tadreeb2"]
+
 SUPABASE_URL = os.environ.get("SUPABASE_URL", "https://urnawuapfkhxvqvepzit.supabase.co")
 SUPABASE_KEY = os.environ.get("SUPABASE_KEY", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVybmF3dWFwZmtoeHZxdmVweml0Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc4ODA5NTQxMCwiZXhwIjoyMTAzNjcxNDEwfQ.hg8Ki6qvoI_Fhammt_87t-HfTZPSdvl6nYn5bUtThzo")
 supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
@@ -125,7 +127,14 @@ def index():
             return jsonify({"success": False, "message": "غير مصرح لك بإضافة أو تعديل البيانات"}), 403
 
         form_data = request.form
+        username = session.get("user", "")
         logged_emp_name = session.get("employee_name", "موظف النظام")
+
+        # إذا كان الحساب يخص متطوع أو متدرب، يتم دمج اسمه الفعلي المدخل مع اسم الحساب
+        if username in VOLUNTEER_ACCOUNTS:
+            actual_name = form_data.get("actual_volunteer_name", "").strip()
+            if actual_name:
+                logged_emp_name = f"{actual_name} ({session.get('employee_name')})"
 
         patient_name = form_data.get("patient_name")
         patient_phone = form_data.get("patient_phone", "-")
@@ -151,7 +160,7 @@ def index():
         try:
             supabase.table("support_unit_records").insert(record).execute()
 
-            # إرسال التنبيه التلقائي للمريض عبر Green API عند الضغط على زر الواتساب
+            # إرسال التنبيه التلقائي للمريض عبر Green API عند اختيار الإرسال
             if send_whatsapp == "yes":
                 send_whatsapp_green_api(
                     phone=patient_phone,
@@ -196,7 +205,8 @@ def index():
         records=records, 
         logged_employee=session.get("employee_name"),
         can_edit=session.get("can_edit", True),
-        user_role=session.get("role")
+        user_role=session.get("role"),
+        is_volunteer=(session.get("user") in VOLUNTEER_ACCOUNTS)
     )
 
 @app.route("/update_action", methods=["POST"])
