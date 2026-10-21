@@ -38,7 +38,7 @@
             min-height: 60px;
         }
         .header-banner img {
-            height: 200px;
+            height: 198px;
             width: auto;
             position: absolute;
             right: 20px;
@@ -525,7 +525,7 @@
                                 <td>
                                     <button type="button" class="btn-reprint" 
                                             onclick="reprintTicket('{{ ticket_num }}', '{{ record.get('patient_name', '-')|e }}', '{{ record.get('service_type', '-')|e }}', '{{ record.get('department', '-')|e }}', '{{ record.get('target_employee', '-')|e }}', '{{ record.get('employee_name', '-')|e }}', '{{ record.get('record_date', '') }}', '{{ record.get('record_time', '') }}')">
-                                        🖨️ طباعة
+                                         طباعة التذكرة
                                     </button>
                                 </td>
                             </tr>
@@ -585,7 +585,7 @@
             <input type="hidden" id="modalPatientDept">
         </div>
         <div class="modal-footer">
-            <button type="button" class="btn-modal-print" onclick="printActionReport()">🖨️ طباعة الإجراءات</button>
+            <button type="button" class="btn-modal-print" onclick="printActionReport()"> طباعة الإجراءات</button>
             <button type="button" class="btn-modal-save" onclick="saveActionNote()">إضافة الملاحظة</button>
             <button type="button" class="btn-modal-cancel" onclick="closeNoteModal()">إلغاء</button>
         </div>
