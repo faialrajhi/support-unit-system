@@ -261,8 +261,8 @@ def update_action():
         timestamp_header = f"📌 [{action_date} {action_time} | الموظف/المشرف: {action_employee}]"
         new_entry = f"{timestamp_header}\n{new_action_text}"
 
-        # دمج الملاحظات الجديدة مع السابقة
-        if current_notes and current_notes.strip() != "-":
+        # دمج الملاحظات الجديدة مع السابقة بشكل تراكمي
+        if current_notes and current_notes.strip() != "" and current_notes.strip() != "-":
             updated_notes = f"{new_entry}\n\n----------------------------------------\n\n{current_notes}"
         else:
             updated_notes = new_entry
