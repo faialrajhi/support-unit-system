@@ -235,9 +235,7 @@
             align-items: center;
             gap: 3px;
         }
-        .btn-reprint:hover {
-            background-color: #0369a1;
-        }
+        .btn-reprint:hover { background-color: #0369a1; }
 
         .modal-overlay {
             position: fixed;
@@ -256,7 +254,7 @@
             background: #fff;
             border-radius: 8px;
             width: 90%;
-            max-width: 500px;
+            max-width: 520px;
             box-shadow: 0 10px 25px rgba(0,0,0,0.15);
             overflow: hidden;
             animation: modalFadeIn 0.2s ease-out;
@@ -282,12 +280,13 @@
             border: 1px solid #cbd5e1;
             border-radius: 6px;
             padding: 10px;
-            font-size: 0.8rem;
-            max-height: 140px;
+            font-size: 0.82rem;
+            max-height: 180px;
             overflow-y: auto;
             white-space: pre-wrap;
             margin-bottom: 12px;
-            color: #1e293b;
+            color: #0f172a;
+            line-height: 1.5;
         }
         .modal-textarea { width: 100%; height: 75px; padding: 8px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 0.82rem; outline: none; resize: vertical; }
         .modal-footer { padding: 10px 16px 12px; display: flex; gap: 8px; justify-content: flex-end; }
@@ -502,9 +501,13 @@
                             <tr>
                                 <td><strong>{{ ticket_num }}</strong></td>
                                 <td>
+                                    <!-- الاستعانة بـ data-notes لتفادي أخطاء الأسطر الجديدة -->
                                     <span class="patient-link" 
-                                         title="انقر لإضافة إجراء أو عرض سجل الملاحظات"
-                                         onclick="openActionNote('{{ record.get('id') }}', '{{ record.get('patient_name', '') }}', '{% if is_valid_note %}{{ note_text|e }}{% endif %}')">
+                                          data-id="{{ record.get('id') }}"
+                                          data-name="{{ record.get('patient_name', '')|e }}"
+                                          data-notes="{{ note_text|e }}"
+                                          title="انقر لإضافة إجراء أو عرض سجل الملاحظات"
+                                          onclick="openActionNoteFromEl(this)">
                                         {{ record.get('patient_name', '-') }} {% if is_valid_note %}📝{% endif %}
                                     </span>
                                 </td>
@@ -538,7 +541,7 @@
     </div>
 </div>
 
-<!-- النافذة المنبثقة المحدثة بسجل التاريخ السابق والملاحظة الجديدة -->
+<!-- النافذة المنبثقة المحدثة -->
 <div id="noteModal" class="modal-overlay" onclick="closeModalOnOverlay(event)">
     <div class="modal-card">
         <div class="modal-header">
@@ -548,7 +551,7 @@
         <div class="modal-body">
             <div class="modal-patient-name" id="modalPatientTitle"></div>
             
-            <label>سجل الملاحظات والإجراءات السابقة:</label>
+            <label style="font-weight: 600; margin-bottom: 5px; display: block;">سجل الملاحظات والإجراءات السابقة:</label>
             <div id="modalHistoryBox" class="history-box">لا توجد ملاحظات سابقة.</div>
 
             <div class="mb-3">
@@ -602,7 +605,7 @@
     </div>
 </div>
 
-<!-- مكتبة Supabase للتحديث اللحظي -->
+<!-- مكتبة Supabase والتحديث اللحظي -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
     const SUPABASE_URL = "https://urnawuapfkhxvqvepzit.supabase.co";
@@ -762,11 +765,15 @@
         printArea.style.display = 'none';
     }
 
-    // فتح النافذة وعرض سجل الملاحظات السابقة وإعداد خانات الملاحظة الجديدة
-    function openActionNote(recordId, patientName, previousNotes) {
+    // قراءة البيانات من عنصر المريض بآمان
+    function openActionNoteFromEl(el) {
+        const recordId = el.getAttribute('data-id');
+        const patientName = el.getAttribute('data-name');
+        const previousNotes = el.getAttribute('data-notes');
+
         document.getElementById('modalRecordId').value = recordId;
         document.getElementById('modalPatientTitle').innerText = "المريض: " + patientName;
-        document.getElementById('modalHistoryBox').innerText = (previousNotes && previousNotes !== '-') ? previousNotes : "لا توجد ملاحظات سابقة.";
+        document.getElementById('modalHistoryBox').innerText = (previousNotes && previousNotes.trim() !== '' && previousNotes !== '-') ? previousNotes : "لا توجد ملاحظات سابقة.";
         document.getElementById('modalActionInput').value = "";
 
         const now = new Date();
