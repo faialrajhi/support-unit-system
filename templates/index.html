@@ -222,6 +222,23 @@
         }
         .patient-link:hover { color: #0f3750; }
 
+        .btn-reprint {
+            background-color: #0284c7;
+            color: white;
+            border: none;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 0.72rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 3px;
+        }
+        .btn-reprint:hover {
+            background-color: #0369a1;
+        }
+
         .modal-overlay {
             position: fixed;
             top: 0;
@@ -461,16 +478,17 @@
                                 <th>القسم</th>
                                 <th>الموظف المعني</th>
                                 <th>موظف تجربة المريض</th>
-                                <th>التاريخ</th>
-                                <th>الوقت</th>
+                                <th>التاريخ والوقت</th>
+                                <th>إعادة طباعة</th>
                             </tr>
                         </thead>
                         <tbody>
                             {% for record in records %}
                             {% set note_text = record.get('notes', '') %}
                             {% set is_valid_note = note_text and note_text.strip() != '' and note_text.strip() != '-' %}
+                            {% set ticket_num = records|length - loop.index0 %}
                             <tr>
-                                <td><strong>{{ records|length - loop.index0 }}</strong></td>
+                                <td><strong>{{ ticket_num }}</strong></td>
                                 <td>
                                     <span class="patient-link" 
                                          title="انقر لتعديل أو عرض الإجراء المتخذ"
@@ -485,8 +503,13 @@
                                 <td>{{ record.get('department', '-') }}</td>
                                 <td><strong>{{ record.get('target_employee', '-') }}</strong></td>
                                 <td>{{ record.get('employee_name', '-') }}</td>
-                                <td>{{ record.get('record_date', '-') }}</td>
-                                <td>{{ record.get('record_time', '-') }}</td>
+                                <td>{{ record.get('record_date', '-') }} {{ record.get('record_time', '') }}</td>
+                                <td>
+                                    <button type="button" class="btn-reprint" 
+                                            onclick="reprintTicket('{{ ticket_num }}', '{{ record.get('patient_name', '-')|e }}', '{{ record.get('service_type', '-')|e }}', '{{ record.get('department', '-')|e }}', '{{ record.get('target_employee', '-')|e }}', '{{ record.get('employee_name', '-')|e }}', '{{ record.get('record_date', '') }}', '{{ record.get('record_time', '') }}')">
+                                        🖨️ طباعة
+                                    </button>
+                                </td>
                             </tr>
                             {% else %}
                             <tr>
@@ -503,7 +526,7 @@
     </div>
 </div>
 
-<!-- النافذة المنبثقة للتعديل المحدثة بخانات التاريخ والوقت واسم الموظف -->
+<!-- النافذة المنبثقة للتعديل -->
 <div id="noteModal" class="modal-overlay" onclick="closeModalOnOverlay(event)">
     <div class="modal-card">
         <div class="modal-header">
@@ -557,7 +580,7 @@
             <strong>القسم:</strong> <span id="ticketDept">-</span><br>
             <strong>الموظف المعني:</strong> <span id="ticketTargetEmp">-</span><br>
             <strong>التاريخ والوقت:</strong> <span id="ticketDateTime">-</span><br>
-            <strong>موظف تجربة المريض:</strong> <span>{{ logged_employee }}</span>
+            <strong>موظف تجربة المريض:</strong> <span id="ticketLoggedEmp">{{ logged_employee }}</span>
         </div>
         <hr style="border: 0.5px solid #ccc; margin: 10px 0;">
         <p style="font-size: 10px; color: #777;">نتمنى لك دوام الصحة والعافية</p>
@@ -687,6 +710,7 @@
         document.getElementById('ticketService').innerText = pService;
         document.getElementById('ticketDept').innerText = pDept;
         document.getElementById('ticketTargetEmp').innerText = pTargetEmp;
+        document.getElementById('ticketLoggedEmp').innerText = loggedUserDefault;
         
         const now = new Date();
         const formattedDate = (now.getMonth() + 1) + '/' + now.getDate() + '/' + now.getFullYear().toString().slice(-2);
@@ -708,7 +732,22 @@
         document.getElementById('recordForm').submit();
     }
 
-    // فتح النافذة المنبثقة مع تعبئة التاريخ والوقت واسم الموظف تلقائياً
+    // دالة إضافية لإعادة طباعة تذكرة مريض سابق مباشرة من الجدول
+    function reprintTicket(ticketNo, pName, pService, pDept, pTargetEmp, empName, recDate, recTime) {
+        document.getElementById('ticketNumber').innerText = "#" + ticketNo;
+        document.getElementById('ticketPatientName').innerText = pName;
+        document.getElementById('ticketService').innerText = pService;
+        document.getElementById('ticketDept').innerText = pDept;
+        document.getElementById('ticketTargetEmp').innerText = pTargetEmp;
+        document.getElementById('ticketLoggedEmp').innerText = empName;
+        document.getElementById('ticketDateTime').innerText = recDate + ' ' + recTime;
+
+        const printArea = document.getElementById('printTicketArea');
+        printArea.style.display = 'block';
+        window.print();
+        printArea.style.display = 'none';
+    }
+
     function openActionNote(recordId, patientName, currentAction, actionDate, actionTime, actionEmp) {
         document.getElementById('modalRecordId').value = recordId;
         document.getElementById('modalPatientTitle').innerText = "المريض: " + patientName;
