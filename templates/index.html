@@ -323,7 +323,9 @@
 
                     <div class="mb-3">
                         <label for="national_id">رقم الهوية</label>
-                        <input type="text" id="national_id" name="national_id" class="form-control" placeholder="10xxxxxxx" pattern="[0-9]{10}" maxlength="10">
+                        <input type="text" id="national_id" name="national_id" class="form-control" placeholder="10xxxxxxx" pattern="[0-9]{10}" maxlength="10" oninput="checkNationalIdExists()" onblur="checkNationalIdExists()">
+                        <!-- التنبيه الفوري لتكرار الهوية -->
+                        <small id="nationalIdWarning" style="color: #dc2626; font-weight: 700; display: none; margin-top: 4px; font-size: 0.78rem;"></small>
                     </div>
 
                     <div class="mb-3">
@@ -393,13 +395,13 @@
                     </div>
 
                     <div class="btn-group-actions">
-                        <button type="submit" onclick="submitWithWhatsapp()" class="btn-action btn-whatsapp">
+                        <button type="submit" id="submitWhatsappBtn" onclick="submitWithWhatsapp()" class="btn-action btn-whatsapp">
                              حفظ وإرسال واتساب
                         </button>
-                        <button type="button" onclick="submitAndPrintTicket()" class="btn-action btn-print">
+                        <button type="button" id="printTicketBtn" onclick="submitAndPrintTicket()" class="btn-action btn-print">
                              حفظ وطباعة تذكرة الانتظار
                         </button>
-                        <button type="submit" onclick="submitOnlySave()" class="btn-action btn-save-only">
+                        <button type="submit" id="submitSaveBtn" onclick="submitOnlySave()" class="btn-action btn-save-only">
                             حفظ بالسجل فقط
                         </button>
                     </div>
@@ -535,7 +537,7 @@
     </div>
 </div>
 
-<!-- مكتبة Supabase للتحديث اللحظي بدون مسح حقول الإدخال -->
+<!-- مكتبة Supabase للتحديث اللحظي بدون مسح البيانات -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
     const SUPABASE_URL = "https://urnawuapfkhxvqvepzit.supabase.co";
@@ -543,7 +545,7 @@
     
     const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    // التحقق عما إذا كان المستخدم يكتب حالياً في النموذج لمنع أي تحديث مزعج
+    // دالة التحقق مما إذا كان الموظف يكتب حالياً في أحد الحقول لعدم تحديث الصفحة
     function isUserTyping() {
         const activeElement = document.activeElement;
         if (!activeElement) return false;
@@ -551,7 +553,6 @@
         return tag === 'input' || tag === 'textarea' || tag === 'select';
     }
 
-    // الاستماع اللحظي: يتم تحديث الصفحة فقط إذا كان المستخدم لا يكتب شيئاً الآن
     supabaseClient
         .channel('support_unit_realtime')
         .on(
@@ -564,6 +565,54 @@
             }
         )
         .subscribe();
+
+    // دالة فحص تكرار رقم الهوية الفوري في الصفحة
+    function checkNationalIdExists() {
+        const natIdInput = document.getElementById('national_id');
+        const warningEl = document.getElementById('nationalIdWarning');
+        const natId = natIdInput.value.trim();
+
+        if (!natId || natId === "-" || natId.length < 10) {
+            warningEl.style.display = 'none';
+            natIdInput.style.borderColor = '#cbd5e1';
+            setButtonsDisabled(false);
+            return;
+        }
+
+        fetch('/check_national_id', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ national_id: natId })
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.exists) {
+                warningEl.innerText = `⚠️ تنبيه: رقم الهوية (${natId}) مسجل مسبقاً لمريض آخر ("${data.patient_name}")!`;
+                warningEl.style.display = 'block';
+                natIdInput.style.borderColor = '#dc2626';
+                setButtonsDisabled(true);
+            } else {
+                warningEl.style.display = 'none';
+                natIdInput.style.borderColor = '#cbd5e1';
+                setButtonsDisabled(false);
+            }
+        })
+        .catch(err => console.error("Error checking ID:", err));
+    }
+
+    function setButtonsDisabled(disabled) {
+        const btn1 = document.getElementById('submitWhatsappBtn');
+        const btn2 = document.getElementById('printTicketBtn');
+        const btn3 = document.getElementById('submitSaveBtn');
+        
+        [btn1, btn2, btn3].forEach(b => {
+            if (b) {
+                b.disabled = disabled;
+                b.style.opacity = disabled ? "0.5" : "1";
+                b.style.cursor = disabled ? "not-allowed" : "pointer";
+            }
+        });
+    }
 
     function setDateTime() {
         const now = new Date();
