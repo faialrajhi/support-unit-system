@@ -53,17 +53,30 @@ def send_whatsapp_green_api(phone, patient_name, service_type):
 # قائمة المستخدمين
 # =========================
 USERS = {
+    # المدير (Admin)
     "turky": {"password": "123", "name": "تركي عبدالعزيز", "role": "admin", "title": "مدير النظام", "can_edit": True},
+    
+    # المشرفين
     "mohd": {"password": "123", "name": "محمد", "role": "employee", "title": "مشرف / موظف دعم", "can_edit": True},
     "raja": {"password": "123", "name": "رجاء", "role": "supervisor", "title": "مشرفة", "can_edit": False},
     "hosam": {"password": "123", "name": "حسام", "role": "supervisor", "title": "مشرف", "can_edit": False},
+
+    # الموظفين (Employees)
     "ibrahim": {"password": "123", "name": "ابراهيم بخاري", "role": "employee", "title": "موظف دعم", "can_edit": True},
     "saleh": {"password": "123", "name": "صالح حنيف", "role": "employee", "title": "موظف دعم", "can_edit": True},
     "ahlam": {"password": "123", "name": "احلام هوساوي", "role": "employee", "title": "موظفة دعم", "can_edit": True},
     "maatouq": {"password": "123", "name": "معتوق سيف", "role": "employee", "title": "موظف دعم", "can_edit": True},
     "saleem": {"password": "123", "name": "سليم الشريف", "role": "employee", "title": "موظف دعم", "can_edit": True},
     "fowzi": {"password": "123", "name": "فوزي بليلة", "role": "employee", "title": "موظف دعم", "can_edit": True},
-    "rami": {"password": "123", "name": "رامي اللقماني", "role": "employee", "title": "موظف دعم", "can_edit": True}
+    "rami": {"password": "123", "name": "رامي اللقماني", "role": "employee", "title": "موظف دعم", "can_edit": True},
+
+    # حسابات المتطوعين والمتدربين المضافة حديثاً
+    "tatwa1": {"password": "123", "name": "تطوع1", "role": "employee", "title": "متطوع", "can_edit": True},
+    "tatwa2": {"password": "123", "name": "تطوع2", "role": "employee", "title": "متطوع", "can_edit": True},
+    "tamheer1": {"password": "123", "name": "تمهير1", "role": "employee", "title": "متدرب تمهير", "can_edit": True},
+    "tamheer2": {"password": "123", "name": "تمهير2", "role": "employee", "title": "متدرب تمهير", "can_edit": True},
+    "tadreeb1": {"password": "123", "name": "تدريب1", "role": "employee", "title": "متدرب", "can_edit": True},
+    "tadreeb2": {"password": "123", "name": "تدريب2", "role": "employee", "title": "متدرب", "can_edit": True}
 }
 
 SUPABASE_URL = os.environ.get("SUPABASE_URL", "https://urnawuapfkhxvqvepzit.supabase.co")
