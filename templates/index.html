@@ -256,7 +256,7 @@
             background: #fff;
             border-radius: 8px;
             width: 90%;
-            max-width: 460px;
+            max-width: 500px;
             box-shadow: 0 10px 25px rgba(0,0,0,0.15);
             overflow: hidden;
             animation: modalFadeIn 0.2s ease-out;
@@ -275,9 +275,21 @@
         }
         .modal-header h3 { font-size: 0.9rem; font-weight: 600; }
         .modal-close { background: transparent; border: none; color: white; font-size: 1.3rem; cursor: pointer; }
-        .modal-body { padding: 16px; font-size: 0.85rem; color: #334155; }
+        .modal-body { padding: 16px; font-size: 0.85rem; color: #334155; max-height: 80vh; overflow-y: auto; }
         .modal-patient-name { font-weight: 600; color: #164D6E; margin-bottom: 12px; font-size: 0.88rem; }
-        .modal-textarea { width: 100%; height: 80px; padding: 8px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 0.82rem; outline: none; resize: vertical; }
+        .history-box {
+            background: #f8fafc;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            padding: 10px;
+            font-size: 0.8rem;
+            max-height: 140px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            margin-bottom: 12px;
+            color: #1e293b;
+        }
+        .modal-textarea { width: 100%; height: 75px; padding: 8px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 0.82rem; outline: none; resize: vertical; }
         .modal-footer { padding: 10px 16px 12px; display: flex; gap: 8px; justify-content: flex-end; }
         .btn-modal-save { background: #164D6E; color: white; border: none; padding: 6px 16px; border-radius: 5px; font-weight: 600; cursor: pointer; font-size: 0.78rem; }
         .btn-modal-cancel { background: #64748b; color: white; border: none; padding: 6px 12px; border-radius: 5px; font-weight: 600; cursor: pointer; font-size: 0.78rem; }
@@ -491,8 +503,8 @@
                                 <td><strong>{{ ticket_num }}</strong></td>
                                 <td>
                                     <span class="patient-link" 
-                                         title="انقر لتعديل أو عرض الإجراء المتخذ"
-                                         onclick="openActionNote('{{ record.get('id') }}', '{{ record.get('patient_name', '') }}', '{% if is_valid_note %}{{ note_text|e }}{% endif %}', '{{ record.get('action_date', '') }}', '{{ record.get('action_time', '') }}', '{{ record.get('action_employee_name', '') }}')">
+                                         title="انقر لإضافة إجراء أو عرض سجل الملاحظات"
+                                         onclick="openActionNote('{{ record.get('id') }}', '{{ record.get('patient_name', '') }}', '{% if is_valid_note %}{{ note_text|e }}{% endif %}')">
                                         {{ record.get('patient_name', '-') }} {% if is_valid_note %}📝{% endif %}
                                     </span>
                                 </td>
@@ -507,7 +519,7 @@
                                 <td>
                                     <button type="button" class="btn-reprint" 
                                             onclick="reprintTicket('{{ ticket_num }}', '{{ record.get('patient_name', '-')|e }}', '{{ record.get('service_type', '-')|e }}', '{{ record.get('department', '-')|e }}', '{{ record.get('target_employee', '-')|e }}', '{{ record.get('employee_name', '-')|e }}', '{{ record.get('record_date', '') }}', '{{ record.get('record_time', '') }}')">
-                                          طباعة التذكرة
+                                        🖨️ طباعة
                                     </button>
                                 </td>
                             </tr>
@@ -526,41 +538,44 @@
     </div>
 </div>
 
-<!-- النافذة المنبثقة للتعديل -->
+<!-- النافذة المنبثقة المحدثة بسجل التاريخ السابق والملاحظة الجديدة -->
 <div id="noteModal" class="modal-overlay" onclick="closeModalOnOverlay(event)">
     <div class="modal-card">
         <div class="modal-header">
-            <h3>تفاصيل الإجراء المتخذ</h3>
+            <h3>تفاصيل الإجراءات والملاحظات</h3>
             <button class="modal-close" onclick="closeNoteModal()">&times;</button>
         </div>
         <div class="modal-body">
             <div class="modal-patient-name" id="modalPatientTitle"></div>
             
+            <label>سجل الملاحظات والإجراءات السابقة:</label>
+            <div id="modalHistoryBox" class="history-box">لا توجد ملاحظات سابقة.</div>
+
             <div class="mb-3">
-                <label for="modalActionInput">الإجراء المتخذ / ملاحظات:</label>
-                <textarea id="modalActionInput" class="modal-textarea" placeholder="اكتب الإجراء المتخذ للمريض هنا..."></textarea>
+                <label for="modalActionInput" style="font-weight: 700; color: #164D6E;">إضافة إجراء / ملاحظة جديدة:</label>
+                <textarea id="modalActionInput" class="modal-textarea" placeholder="اكتب ملاحظتك أو الإجراء المتخذ هنا..."></textarea>
             </div>
 
             <div class="modal-grid">
                 <div>
-                    <label for="modalActionDate">تاريخ الإجراء:</label>
+                    <label for="modalActionDate">التاريخ:</label>
                     <input type="date" id="modalActionDate" class="form-control">
                 </div>
                 <div>
-                    <label for="modalActionTime">وقت الإجراء:</label>
+                    <label for="modalActionTime">الوقت:</label>
                     <input type="time" id="modalActionTime" class="form-control">
                 </div>
             </div>
 
             <div class="mb-3" style="margin-top: 10px;">
-                <label for="modalActionEmployee">اسم الموظف القائم بالإجراء:</label>
+                <label for="modalActionEmployee">اسم الموظف / المشرف:</label>
                 <input type="text" id="modalActionEmployee" class="form-control" placeholder="اسم الموظف">
             </div>
 
             <input type="hidden" id="modalRecordId">
         </div>
         <div class="modal-footer">
-            <button type="button" class="btn-modal-save" onclick="saveActionNote()">حفظ الإجراء</button>
+            <button type="button" class="btn-modal-save" onclick="saveActionNote()">إضافة الملاحظة</button>
             <button type="button" class="btn-modal-cancel" onclick="closeNoteModal()">إلغاء</button>
         </div>
     </div>
@@ -732,7 +747,6 @@
         document.getElementById('recordForm').submit();
     }
 
-    // دالة إضافية لإعادة طباعة تذكرة مريض سابق مباشرة من الجدول
     function reprintTicket(ticketNo, pName, pService, pDept, pTargetEmp, empName, recDate, recTime) {
         document.getElementById('ticketNumber').innerText = "#" + ticketNo;
         document.getElementById('ticketPatientName').innerText = pName;
@@ -748,18 +762,20 @@
         printArea.style.display = 'none';
     }
 
-    function openActionNote(recordId, patientName, currentAction, actionDate, actionTime, actionEmp) {
+    // فتح النافذة وعرض سجل الملاحظات السابقة وإعداد خانات الملاحظة الجديدة
+    function openActionNote(recordId, patientName, previousNotes) {
         document.getElementById('modalRecordId').value = recordId;
         document.getElementById('modalPatientTitle').innerText = "المريض: " + patientName;
-        document.getElementById('modalActionInput').value = currentAction ? currentAction : "";
+        document.getElementById('modalHistoryBox').innerText = (previousNotes && previousNotes !== '-') ? previousNotes : "لا توجد ملاحظات سابقة.";
+        document.getElementById('modalActionInput').value = "";
 
         const now = new Date();
         const todayDate = now.toISOString().split('T')[0];
         const currentTime = String(now.getHours()).padStart(2, '0') + ':' + String(now.getMinutes()).padStart(2, '0');
 
-        document.getElementById('modalActionDate').value = (actionDate && actionDate !== '-') ? actionDate : todayDate;
-        document.getElementById('modalActionTime').value = (actionTime && actionTime !== '-') ? actionTime : currentTime;
-        document.getElementById('modalActionEmployee').value = (actionEmp && actionEmp !== '-') ? actionEmp : loggedUserDefault;
+        document.getElementById('modalActionDate').value = todayDate;
+        document.getElementById('modalActionTime').value = currentTime;
+        document.getElementById('modalActionEmployee').value = loggedUserDefault;
 
         document.getElementById('noteModal').style.display = 'flex';
     }
@@ -780,6 +796,11 @@
         const actionDate = document.getElementById('modalActionDate').value;
         const actionTime = document.getElementById('modalActionTime').value;
         const actionEmployee = document.getElementById('modalActionEmployee').value;
+
+        if (!actionText.trim()) {
+            alert("يرجى كتابة الملاحظة أو الإجراء المتخذ أولاً.");
+            return;
+        }
 
         fetch('/update_action', {
             method: 'POST',
