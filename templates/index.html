@@ -48,9 +48,10 @@
             font-size: 1.25rem;
             font-weight: 600;
         }
+        /* تم توحيد العرض هنا ليظهر المدير والموظف بنفس التنسيق الجانبي */
         .main-layout {
             display: grid;
-            grid-template-columns: {% if user_role == 'admin' %}1fr{% else %}340px minmax(0, 1fr){% endif %};
+            grid-template-columns: 340px minmax(0, 1fr);
             gap: 15px;
             align-items: start;
         }
@@ -525,7 +526,7 @@
                                 <td>
                                     <button type="button" class="btn-reprint" 
                                             onclick="reprintTicket('{{ ticket_num }}', '{{ record.get('patient_name', '-')|e }}', '{{ record.get('service_type', '-')|e }}', '{{ record.get('department', '-')|e }}', '{{ record.get('target_employee', '-')|e }}', '{{ record.get('employee_name', '-')|e }}', '{{ record.get('record_date', '') }}', '{{ record.get('record_time', '') }}')">
-                                         طباعة التذكرة
+                                        طباعة التذكرة
                                     </button>
                                 </td>
                             </tr>
@@ -840,7 +841,6 @@
         }
     }
 
-    // دالة طباعة تقرير الإجراءات والملاحظات
     function printActionReport() {
         const pName = document.getElementById('modalPatientTitle').innerText.replace('المريض: ', '');
         const natId = document.getElementById('modalPatientNatId').value;
@@ -852,7 +852,6 @@
 
         let fullContent = "";
         
-        // دمج الملاحظة الجديدة إذا كتبت مع الملاحظات القديمة في الصفحة المطبوعة
         if (newText) {
             const dateVal = document.getElementById('modalActionDate').value;
             const timeVal = document.getElementById('modalActionTime').value;
