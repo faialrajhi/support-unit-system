@@ -60,8 +60,8 @@ def send_whatsapp_green_api(phone, patient_name, service_type, national_id, depa
 # قائمة المستخدمين
 # =========================
 USERS = {
-    # المدير (Admin)
-    "turky": {"password": "123", "name": "تركي محمد المولد ", "role": "admin", "title": "مدير النظام", "can_edit": True},
+    # المدير (Admin) - جميع الصلاحيات متاحة بالإفادة والإضافة والتعديل
+    "turky": {"password": "123", "name": "تركي محمد المولد", "role": "admin", "title": "مدير النظام", "can_edit": True},
     
     # المشرفين
     "mohd": {"password": "123", "name": "محمد", "role": "employee", "title": "مشرف / موظف دعم", "can_edit": True},
