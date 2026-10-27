@@ -57,7 +57,7 @@ def send_whatsapp_green_api(phone, patient_name, service_type, national_id, depa
         print("خطأ أثناء إرسال رسالة الواتساب عبر Green API:", e)
 
 # =========================
-# قائمة المستخدمين (بالأرقام الوظيفية الرسمية)
+# قائمة المستخدمين (بالأرقام الوظيفية الرسمية + المتطوعين والمتدربين)
 # =========================
 USERS = {
     # المدير (Admin)
@@ -82,14 +82,22 @@ USERS = {
     "2530438": {"password": "123", "name": "وجدان عبدالله عراقي", "role": "employee", "title": "موظفة دعم", "can_edit": True},
     "55926":   {"password": "123", "name": "حسام زيني الهاشم", "role": "supervisor", "title": "مشرف", "can_edit": False},
 
-    # الأسماء والإضافات الجديدة
+    # الموظفين الإضافيين
     "51732802": {"password": "123", "name": "اياد", "role": "employee", "title": "موظف دعم", "can_edit": True},
     "51732846": {"password": "123", "name": "نواف", "role": "employee", "title": "موظف دعم", "can_edit": True},
     "51731984": {"password": "123", "name": "خلود", "role": "employee", "title": "موظفة دعم", "can_edit": True},
-    "51732709": {"password": "123", "name": "عبدالرحمن", "role": "employee", "title": "موظف دعم", "can_edit": True}
+    "51732709": {"password": "123", "name": "عبدالرحمن", "role": "employee", "title": "موظف دعم", "can_edit": True},
+
+    # حسابات المتطوعين والمتدربين
+    "9001": {"password": "123", "name": "تطوع1", "role": "employee", "title": "متطوع", "can_edit": True},
+    "9002": {"password": "123", "name": "تطوع2", "role": "employee", "title": "متطوع", "can_edit": True},
+    "9003": {"password": "123", "name": "تمهير1", "role": "employee", "title": "متدرب تمهير", "can_edit": True},
+    "9004": {"password": "123", "name": "تمهير2", "role": "employee", "title": "متدرب تمهير", "can_edit": True},
+    "9005": {"password": "123", "name": "تدريب1", "role": "employee", "title": "متدرب", "can_edit": True},
+    "9006": {"password": "123", "name": "تدريب2", "role": "employee", "title": "متدرب", "can_edit": True}
 }
 
-VOLUNTEER_ACCOUNTS = []
+VOLUNTEER_ACCOUNTS = ["9001", "9002", "9003", "9004", "9005", "9006"]
 
 SUPABASE_URL = os.environ.get("SUPABASE_URL", "https://urnawuapfkhxvqvepzit.supabase.co")
 SUPABASE_KEY = os.environ.get("SUPABASE_KEY", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVybmF3dWFwZmtoeHZxdmVweml0Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc4ODA5NTQxMCwiZXhwIjoyMTAzNjcxNDEwfQ.hg8Ki6qvoI_Fhammt_87t-HfTZPSdvl6nYn5bUtThzo")
