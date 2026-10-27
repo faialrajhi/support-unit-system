@@ -57,7 +57,7 @@ def send_whatsapp_green_api(phone, patient_name, service_type, national_id, depa
         print("خطأ أثناء إرسال رسالة الواتساب عبر Green API:", e)
 
 # =========================
-# قائمة المستخدمين (بالأرقام الوظيفية الرسمية + المتطوعين والمتدربين)
+# قائمة المستخدمين (بالأرقام الوظيفية الرسمية + حسابات التدريب والتمهير والتطوع)
 # =========================
 USERS = {
     # المدير (Admin)
@@ -88,16 +88,16 @@ USERS = {
     "51731984": {"password": "123", "name": "خلود", "role": "employee", "title": "موظفة دعم", "can_edit": True},
     "51732709": {"password": "123", "name": "عبدالرحمن", "role": "employee", "title": "موظف دعم", "can_edit": True},
 
-    # حسابات المتطوعين والمتدربين
-    "9001": {"password": "123", "name": "تطوع1", "role": "employee", "title": "متطوع", "can_edit": True},
-    "9002": {"password": "123", "name": "تطوع2", "role": "employee", "title": "متطوع", "can_edit": True},
-    "9003": {"password": "123", "name": "تمهير1", "role": "employee", "title": "متدرب تمهير", "can_edit": True},
-    "9004": {"password": "123", "name": "تمهير2", "role": "employee", "title": "متدرب تمهير", "can_edit": True},
-    "9005": {"password": "123", "name": "تدريب1", "role": "employee", "title": "متدرب", "can_edit": True},
-    "9006": {"password": "123", "name": "تدريب2", "role": "employee", "title": "متدرب", "can_edit": True}
+    # حسابات التطوع والتمهير والتدريب (بالصيغة المطلوبة)
+    "tatwa1":  {"password": "123", "name": "متطوع 1", "role": "employee", "title": "متطوع", "can_edit": True},
+    "tatwa2":  {"password": "123", "name": "متطوع 2", "role": "employee", "title": "متطوع", "can_edit": True},
+    "tamher1": {"password": "123", "name": "متدرب تمهير 1", "role": "employee", "title": "متدرب تمهير", "can_edit": True},
+    "tamher2": {"password": "123", "name": "متدرب تمهير 2", "role": "employee", "title": "متدرب تمهير", "can_edit": True},
+    "tadreb1": {"password": "123", "name": "متدرب 1", "role": "employee", "title": "متدرب", "can_edit": True},
+    "tadreb2": {"password": "123", "name": "متدرب 2", "role": "employee", "title": "متدرب", "can_edit": True}
 }
 
-VOLUNTEER_ACCOUNTS = ["9001", "9002", "9003", "9004", "9005", "9006"]
+VOLUNTEER_ACCOUNTS = ["tatwa1", "tatwa2", "tamher1", "tamher2", "tadreb1", "tadreb2"]
 
 SUPABASE_URL = os.environ.get("SUPABASE_URL", "https://urnawuapfkhxvqvepzit.supabase.co")
 SUPABASE_KEY = os.environ.get("SUPABASE_KEY", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVybmF3dWFwZmtoeHZxdmVweml0Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc4ODA5NTQxMCwiZXhwIjoyMTAzNjcxNDEwfQ.hg8Ki6qvoI_Fhammt_87t-HfTZPSdvl6nYn5bUtThzo")
@@ -116,7 +116,7 @@ def login():
             session["can_edit"] = USERS[username]["can_edit"]
             return redirect(url_for("index"))
         else:
-            return render_template("login.html", error="الرقم الوظيفي أو كلمة المرور غير صحيحة")
+            return render_template("login.html", error="الرقم الوظيفي أو اسم المستخدم أو كلمة المرور غير صحيحة")
 
     return render_template("login.html")
 
