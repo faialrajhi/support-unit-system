@@ -57,36 +57,39 @@ def send_whatsapp_green_api(phone, patient_name, service_type, national_id, depa
         print("خطأ أثناء إرسال رسالة الواتساب عبر Green API:", e)
 
 # =========================
-# قائمة المستخدمين
+# قائمة المستخدمين (بالأرقام الوظيفية الرسمية)
 # =========================
 USERS = {
-    # المدير (Admin) - جميع الصلاحيات متاحة بالإفادة والإضافة والتعديل
-    "turky": {"password": "123", "name": "تركي محمد المولد", "role": "admin", "title": "مدير النظام", "can_edit": True},
+    # المدير (Admin)
+    "2510128": {"password": "123", "name": "تركي محمد المولد", "role": "admin", "title": "مدير النظام", "can_edit": True},
     
-    # المشرفين
-    "mohd": {"password": "123", "name": "محمد", "role": "employee", "title": "مشرف / موظف دعم", "can_edit": True},
-    "raja": {"password": "123", "name": "رجاء", "role": "supervisor", "title": "مشرفة", "can_edit": False},
-    "hosam": {"password": "123", "name": "حسام", "role": "supervisor", "title": "مشرف", "can_edit": False},
+    # المشرفين والموظفين (حسب القائمة الرسمية)
+    "4704223": {"password": "123", "name": "إبراهيم رمضان بخاري", "role": "employee", "title": "موظف دعم", "can_edit": True},
+    "0132408": {"password": "123", "name": "أحمد عيسى عز الدين", "role": "employee", "title": "موظف دعم", "can_edit": True},
+    "2532428": {"password": "123", "name": "أحلام إسماعيل هوساوي", "role": "employee", "title": "موظفة دعم", "can_edit": True},
+    "2528242": {"password": "123", "name": "ابتسام دخيل الله المغامسي", "role": "employee", "title": "موظفة دعم", "can_edit": True},
+    "133194":  {"password": "123", "name": "خالد عبدالرحمن سعيد الزهراني", "role": "employee", "title": "موظف دعم", "can_edit": True},
+    "66859":   {"password": "123", "name": "رامي مشعل اللقماني", "role": "employee", "title": "موظف دعم", "can_edit": True},
+    "2517035": {"password": "123", "name": "رجاء احمد مكاوي", "role": "supervisor", "title": "مشرفة", "can_edit": False},
+    "4820994": {"password": "123", "name": "سليم حمود الشريف", "role": "employee", "title": "موظف دعم", "can_edit": True},
+    "2516119": {"password": "123", "name": "صالح عبدالاله حنيف", "role": "employee", "title": "موظف دعم", "can_edit": True},
+    "0128845": {"password": "123", "name": "عبد الله محمد الزهراني", "role": "employee", "title": "موظف دعم", "can_edit": True},
+    "2570221": {"password": "123", "name": "عبد العزيز عويض السلمي", "role": "employee", "title": "موظف دعم", "can_edit": True},
+    "2505131": {"password": "123", "name": "فوزي معتوق بليله", "role": "employee", "title": "موظف دعم", "can_edit": True},
+    "0128858": {"password": "123", "name": "معتوق سيف حسن", "role": "employee", "title": "موظف دعم", "can_edit": True},
+    "2504972": {"password": "123", "name": "محمد سعد الحارثي", "role": "employee", "title": "موظف دعم", "can_edit": True},
+    "7253567": {"password": "123", "name": "نزهه عبد الوهاب السلولي", "role": "employee", "title": "موظفة دعم", "can_edit": True},
+    "2530438": {"password": "123", "name": "وجدان عبدالله عراقي", "role": "employee", "title": "موظفة دعم", "can_edit": True},
+    "55926":   {"password": "123", "name": "حسام زيني الهاشم", "role": "supervisor", "title": "مشرف", "can_edit": False},
 
-    # الموظفين (Employees)
-    "ibrahim": {"password": "123", "name": "ابراهيم بخاري", "role": "employee", "title": "موظف دعم", "can_edit": True},
-    "saleh": {"password": "123", "name": "صالح حنيف", "role": "employee", "title": "موظف دعم", "can_edit": True},
-    "ahlam": {"password": "123", "name": "احلام هوساوي", "role": "employee", "title": "موظفة دعم", "can_edit": True},
-    "maatouq": {"password": "123", "name": "معتوق سيف", "role": "employee", "title": "موظف دعم", "can_edit": True},
-    "saleem": {"password": "123", "name": "سليم الشريف", "role": "employee", "title": "موظف دعم", "can_edit": True},
-    "fowzi": {"password": "123", "name": "فوزي بليلة", "role": "employee", "title": "موظف دعم", "can_edit": True},
-    "rami": {"password": "123", "name": "رامي اللقماني", "role": "employee", "title": "موظف دعم", "can_edit": True},
-
-    # حسابات المتطوعين ومتدربي تمهير
-    "tatwa1": {"password": "123", "name": "تطوع1", "role": "employee", "title": "متطوع", "can_edit": True},
-    "tatwa2": {"password": "123", "name": "تطوع2", "role": "employee", "title": "متطوع", "can_edit": True},
-    "tamheer1": {"password": "123", "name": "تمهير1", "role": "employee", "title": "متدرب تمهير", "can_edit": True},
-    "tamheer2": {"password": "123", "name": "تمهير2", "role": "employee", "title": "متدرب تمهير", "can_edit": True},
-    "tadreeb1": {"password": "123", "name": "تدريب1", "role": "employee", "title": "متدرب", "can_edit": True},
-    "tadreeb2": {"password": "123", "name": "تدريب2", "role": "employee", "title": "متدرب", "can_edit": True}
+    # الأسماء والإضافات الجديدة
+    "51732802": {"password": "123", "name": "اياد", "role": "employee", "title": "موظف دعم", "can_edit": True},
+    "51732846": {"password": "123", "name": "نواف", "role": "employee", "title": "موظف دعم", "can_edit": True},
+    "51731984": {"password": "123", "name": "خلود", "role": "employee", "title": "موظفة دعم", "can_edit": True},
+    "51732709": {"password": "123", "name": "عبدالرحمن", "role": "employee", "title": "موظف دعم", "can_edit": True}
 }
 
-VOLUNTEER_ACCOUNTS = ["tatwa1", "tatwa2", "tamheer1", "tamheer2", "tadreeb1", "tadreeb2"]
+VOLUNTEER_ACCOUNTS = []
 
 SUPABASE_URL = os.environ.get("SUPABASE_URL", "https://urnawuapfkhxvqvepzit.supabase.co")
 SUPABASE_KEY = os.environ.get("SUPABASE_KEY", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVybmF3dWFwZmtoeHZxdmVweml0Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc4ODA5NTQxMCwiZXhwIjoyMTAzNjcxNDEwfQ.hg8Ki6qvoI_Fhammt_87t-HfTZPSdvl6nYn5bUtThzo")
@@ -95,7 +98,7 @@ supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
 @app.route("/login", methods=["GET", "POST"])
 def login():
     if request.method == "POST":
-        username = request.form.get("username", "").strip().lower()
+        username = request.form.get("username", "").strip()
         password = request.form.get("password", "").strip()
 
         if username in USERS and USERS[username]["password"] == password:
@@ -105,7 +108,7 @@ def login():
             session["can_edit"] = USERS[username]["can_edit"]
             return redirect(url_for("index"))
         else:
-            return render_template("login.html", error="اسم المستخدم أو كلمة المرور غير صحيحة")
+            return render_template("login.html", error="الرقم الوظيفي أو كلمة المرور غير صحيحة")
 
     return render_template("login.html")
 
